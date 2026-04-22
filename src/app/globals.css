@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #fafaf8;
+  --color-ink: #333333;
+  --color-ink-light: #555555;
+  --color-accent: #e67e22; /* Warm orange */
+  --color-border-light: #e0e0d8;
+  
+  --font-serif: "Noto Serif JP", YuMincho, "Yu Mincho", "Hiragino Mincho ProN", serif;
+  --font-sans: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-serif);
+    line-height: 1.8;
+    background-image: radial-gradient(#e0e0d8 1px, transparent 0);
+    background-size: 20px 20px; /* Notebook dots effect */
+  }
+}
+
+/* Utilities for notebook style */
+@layer utilities {
+  .border-b-notebook {
+    border-bottom: 1px dashed var(--color-border-light);
+  }
+}

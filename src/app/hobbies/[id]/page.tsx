@@ -142,7 +142,6 @@ export default async function HobbyDetail({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
-
       {/* 紹介文 */}
       <div className="bg-white p-8 rounded-3xl border border-border-light shadow-sm mb-10 leading-relaxed text-ink/90 italic text-lg">
         {formatParagraphsDark(hobby.pitch)}
@@ -183,19 +182,29 @@ export default async function HobbyDetail({ params }: { params: Promise<{ id: st
         </div>
       )}
 
-
-      {/* YouTube検索セクション */}
-      <div className="bg-white p-8 rounded-2xl border border-border-light shadow-sm mb-10">
-        <h3 className="flex items-center gap-2 font-bold text-ink mb-4">
-          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-[#FF0000]"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-          動画で学ぶ
-        </h3>
-        <p className="text-sm text-ink-light mb-5 leading-relaxed">はじめてでも安心。動画で{hobby.name}の始め方やコツをチェックしてみましょう。</p>
-        <a href={youtube.search_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-6 py-3 rounded-full text-white font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200" style={{ backgroundColor: '#FF0000' }}>
-          動画を検索
-        </a>
-      </div>
-
+      {/* YouTubeセクション */}
+      {hobby.youtube && (
+        <div className="mb-12">
+          <h3 className="font-bold text-ink mb-4 flex items-center gap-2">
+            <span className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </span>
+            まずは動画でイメージを膨らませる
+          </h3>
+          <a 
+            href={hobby.youtube.search_url} 
+            target="_blank" 
+            className="group relative block aspect-video rounded-2xl overflow-hidden bg-ink shadow-lg"
+          >
+            <Image src={hobby.youtube.thumbnail_url} alt="YouTube" fill className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+                <svg viewBox="0 0 24 24" className="w-8 h-8 fill-white ml-1"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+          </a>
+        </div>
+      )}
 
       {/* グッズセクション */}
       <div className="mb-16">

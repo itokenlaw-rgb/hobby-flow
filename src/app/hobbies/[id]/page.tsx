@@ -10,78 +10,78 @@ const AMAZON_TRACKING_ID = 'hobbyflow-22';
 const getAmazonUrl = (asin: string) =>
   `https://www.amazon.co.jp/dp/${asin}?tag=${AMAZON_TRACKING_ID}`;
 
-// 商品名でそれぞれのショッピングサイトを検索するURL
-const getRakutenUrl = (name: string) =>
-  `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(name)}/`;
+const getRakutenUrl = (keyword: string) =>
+  `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(keyword)}/`;
 
-const getYahooUrl = (name: string) =>
-  `https://shopping.yahoo.co.jp/search?p=${encodeURIComponent(name)}`;
+const getYahooUrl = (keyword: string) =>
+  `https://shopping.yahoo.co.jp/search?p=${encodeURIComponent(keyword)}`;
 
-// ── マルチリンクボックス（共通コンポーネント） ──────────────────────────────
-function MultiLinkBox({ 
-  name,          // 内部管理用の短い名前（楽天・Yahoo検索キーワードにも使用）
-  amazonTitle,   // Amazonの正式商品名（あればこちらを表示・Amazon検索にも使用）
-  asin, 
-  imageUrl 
-}: { 
+// ── マルチリンクボックス ─────────────────────────────────────────
+function MultiLinkBox({
+  name,
+  amazonTitle,
+  asin,
+  imageUrl,
+}: {
   name: string;
   amazonTitle?: string;
-  asin: string; 
-  imageUrl?: string; 
+  asin: string;
+  imageUrl?: string;
 }) {
-  // 表示用タイトル：amazon_title > name の順で優先
+  // amazon_title があれば優先表示・検索キーワードにも使用
   const displayTitle = amazonTitle || name;
-  // Amazon検索キーワード：amazon_title > name
-  const amazonSearchKeyword = amazonTitle || name;
+  const searchKeyword = amazonTitle || name;
 
   return (
-    <div className="bg-white rounded-2xl border border-border-light shadow-sm overflow-hidden p-4 sm:p-5 mb-6 flex flex-col sm:flex-row gap-5 hover:shadow-md transition-shadow">
-      {/* 左：商品画像 */}
-      <div className="w-full sm:w-32 flex-shrink-0 flex items-center justify-center bg-gray-50 rounded-lg p-2">
+    <div className="bg-white rounded-2xl border border-border-light shadow-sm overflow-hidden flex flex-col sm:flex-row gap-4 p-4 hover:shadow-md transition-shadow">
+      {/* 画像 */}
+      <div className="flex-shrink-0 flex items-center justify-center w-full sm:w-28 bg-cream/40 rounded-xl p-2">
         {imageUrl ? (
-          <img 
-            src={imageUrl} 
-            alt={displayTitle} 
-            className="max-h-32 object-contain shadow-sm"
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={imageUrl}
+            alt={displayTitle}
             referrerPolicy="no-referrer"
+            className="max-h-28 object-contain"
           />
         ) : (
-          <div className="text-[10px] text-ink-light/40 italic">No Image</div>
+          <div className="text-[10px] text-ink-light/40 italic w-28 h-28 flex items-center justify-center">
+            No Image
+          </div>
         )}
       </div>
 
-      {/* 右：タイトルと各社ボタン */}
-      <div className="flex-1 flex flex-col justify-between">
-        <div className="mb-4">
-          <h4 className="text-sm font-bold text-ink leading-snug mb-1">{displayTitle}</h4>
-          <p className="text-[10px] text-ink-light/50">posted with HobbyFlow</p>
+      {/* テキスト＋ボタン */}
+      <div className="flex-1 flex flex-col justify-between gap-3">
+        <div>
+          <p className="text-sm font-bold text-ink leading-snug">{displayTitle}</p>
+          <p className="text-[10px] text-ink-light/50 mt-0.5">posted with HobbyFlow</p>
         </div>
-
-        <div className="flex flex-wrap gap-2 mt-auto">
-          {/* Amazon */}
-          <a 
-            href={getAmazonUrl(asin)} 
-            target="_blank" 
-            rel="noopener noreferrer sponsored" 
-            className="flex-1 min-w-[90px] text-center py-2 px-3 bg-[#FF9900] text-white text-[11px] font-bold rounded hover:opacity-90 transition-opacity"
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={getAmazonUrl(asin)}
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            className="flex-1 min-w-[80px] text-center py-2 px-3 rounded-lg text-[11px] font-bold text-white hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: '#FF9900' }}
           >
             Amazon
           </a>
-          {/* 楽天 */}
-          <a 
-            href={getRakutenUrl(amazonSearchKeyword)} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="flex-1 min-w-[90px] text-center py-2 px-3 bg-[#BF0000] text-white text-[11px] font-bold rounded hover:opacity-90 transition-opacity"
+          <a
+            href={getRakutenUrl(searchKeyword)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 min-w-[80px] text-center py-2 px-3 rounded-lg text-[11px] font-bold text-white hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: '#BF0000' }}
           >
             楽天市場
           </a>
-          {/* Yahoo */}
-          <a 
-            href={getYahooUrl(amazonSearchKeyword)} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="flex-1 min-w-[90px] text-center py-2 px-3 bg-[#4192D9] text-white text-[11px] font-bold rounded hover:opacity-90 transition-opacity"
+          <a
+            href={getYahooUrl(searchKeyword)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 min-w-[80px] text-center py-2 px-3 rounded-lg text-[11px] font-bold text-white hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: '#4192D9' }}
           >
             Yahoo!
           </a>
@@ -91,17 +91,34 @@ function MultiLinkBox({
   );
 }
 
-// ── ヘルパー関数 ──────────────────────────────────────────────────
-function formatParagraphsDark(text: string) {
+// ── テキストフォーマット（元のpage.tsxと同じ実装）────────────────
+const formatTextWithBold = (text: string, color: string) => {
   if (!text) return null;
-  return text.split('\n').map((line, i) => {
-    const processedLine = line.replace(/<<(.*?)>>/g, '<strong class="text-accent">$1</strong>');
-    return (
-      <p key={i} className="mb-4 last:mb-0" dangerouslySetInnerHTML={{ __html: processedLine }} />
-    );
+  return text.split(/(<<.*?>>)/g).map((part, i) => {
+    if (part.startsWith('<<') && part.endsWith('>>')) {
+      return (
+        <strong key={i} className={`${color} font-bold mx-0.5`}>
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
   });
-}
+};
 
+const formatParagraphsDark = (text: string) => {
+  if (!text) return null;
+  return text
+    .split('\n')
+    .filter((line) => line.trim() !== '')
+    .map((line, i) => (
+      <p key={i} className="mb-4 leading-loose tracking-wide">
+        {formatTextWithBold(line, 'text-ink')}
+      </p>
+    ));
+};
+
+// ── generateStaticParams ─────────────────────────────────────────
 export async function generateStaticParams() {
   const filePath = path.join(process.cwd(), 'src/data/hobbies.json');
   if (!fs.existsSync(filePath)) return [];
@@ -109,128 +126,184 @@ export async function generateStaticParams() {
   return hobbiesData.map((hobby: any) => ({ id: hobby.id }));
 }
 
-export default async function HobbyDetail({ params }: { params: Promise<{ id: string }> }) {
+// ── ページ本体 ───────────────────────────────────────────────────
+export default async function HobbyDetail({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const filePath = path.join(process.cwd(), 'src/data/hobbies.json');
   const hobbiesData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  const hobby = hobbiesData.find((h: any) => h.id === id);
+  const hobbyIndex = hobbiesData.findIndex((h: any) => h.id === id);
+  const hobby = hobbiesData[hobbyIndex];
 
   if (!hobby) notFound();
 
+  // ① 元のpage.tsxのimage番号方式を維持
+  const imageNumber = String(hobbyIndex + 1).padStart(3, '0');
+  const imageUrl = `/hobby_image_${imageNumber}.jpg`;
+
+  // pitch を最初の句点で分割
+  const fullPitch = hobby.pitch || '';
+  const firstKutenIndex = fullPitch.indexOf('。');
+  const catchphrase =
+    firstKutenIndex !== -1 ? fullPitch.slice(0, firstKutenIndex + 1) : fullPitch;
+  const remainingPitch =
+    firstKutenIndex !== -1 ? fullPitch.slice(firstKutenIndex + 1).trim() : '';
+
+  // ③ YouTube：元のpage.tsxの方式（フィールドがなければ検索URLを自動生成）
+  let youtube = hobby.youtube;
+  if (!youtube) {
+    const query = `${hobby.name} 初心者 おすすめ 始め方`;
+    youtube = {
+      search_url: `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`,
+      search_query: query,
+    };
+  }
+
   return (
     <div className="max-w-3xl mx-auto px-4 pb-20 animate-in fade-in duration-700">
-      {/* 戻るボタン */}
-      <div className="py-6">
-        <Link href="/" className="inline-flex items-center text-sm text-ink-light hover:text-ink transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-1" /> 趣味を探すに戻る
-        </Link>
-      </div>
 
-      {/* ヒーローセクション */}
-      <div className="relative h-64 sm:h-96 rounded-3xl overflow-hidden mb-8 shadow-xl">
-        <Image src={hobby.image_url} alt={hobby.name} fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
-        <div className="absolute bottom-8 left-8">
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2 tracking-tight">{hobby.name}</h1>
-          <div className="flex gap-2">
-            {hobby.tags.map((tag: string) => (
-              <span key={tag} className="px-3 py-1 bg-white/20 backdrop-blur-md text-white text-xs rounded-full border border-white/30">
-                #{tag}
+      {/* ① ヒーローセクション：元のpage.tsxと同じ構成 */}
+      <div
+        className="relative w-full rounded-2xl overflow-hidden shadow-xl mb-8"
+        style={{ minHeight: '420px' }}
+      >
+        <Image
+          src={imageUrl}
+          alt={hobby.name}
+          fill
+          className="object-cover"
+          unoptimized
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
+        <div className="absolute top-3 left-4">
+          <Link
+            href="/"
+            className="inline-flex items-center text-sm text-white/80 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            TOPに戻る
+          </Link>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 p-6 space-y-3">
+          <h1 className="text-4xl font-bold text-white tracking-tight drop-shadow-md">
+            {hobby.name}
+          </h1>
+          <p className="text-base text-white/80 italic drop-shadow">
+            {formatTextWithBold(catchphrase, 'text-white')}
+          </p>
+          <div className="flex flex-wrap gap-2 pt-1">
+            {hobby.tags?.map((t: string) => (
+              <span
+                key={t}
+                className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-xs text-white shadow-sm"
+              >
+                {t}
               </span>
             ))}
           </div>
         </div>
       </div>
 
-      {/* 紹介文 */}
-      <div className="bg-white p-8 rounded-3xl border border-border-light shadow-sm mb-10 leading-relaxed text-ink/90 italic text-lg">
-        {formatParagraphsDark(hobby.pitch)}
-      </div>
-
-      {/* スペック（予算・時間） */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-        <div className="bg-cream p-6 rounded-2xl border border-border-light">
-          <div className="flex items-center gap-2 text-accent font-bold mb-2">
-            <Wallet className="w-5 h-5" /> 予算の目安
-          </div>
-          <div className="text-sm text-ink-light leading-relaxed">{formatParagraphsDark(hobby.budget)}</div>
+      {/* pitch 残り本文 */}
+      {remainingPitch && (
+        <div className="text-ink text-lg leading-relaxed italic mb-10 px-1 border-b border-border-light pb-8">
+          {formatParagraphsDark(remainingPitch)}
         </div>
-        <div className="bg-cream p-6 rounded-2xl border border-border-light">
-          <div className="flex items-center gap-2 text-accent font-bold mb-2">
-            <Clock className="w-5 h-5" /> 必要な時間
-          </div>
-          <div className="text-sm text-ink-light leading-relaxed">{formatParagraphsDark(hobby.duration)}</div>
-        </div>
-      </div>
+      )}
 
-      {/* 漫画セクション */}
-      {hobby.comic?.title && (
-        <div className="mb-10">
-          <h3 className="flex items-center gap-2 font-bold text-ink mb-6 italic">
-            <BookOpen className="w-5 h-5 text-accent" />
-            {hobby.comic.title} を読んで、世界観に浸る。
+      {/* 時間・予算 */}
+      <div className="grid sm:grid-cols-2 gap-6 mb-10">
+        <div className="bg-white p-6 rounded-2xl border border-border-light shadow-sm">
+          <h3 className="flex items-center gap-2 font-bold text-ink mb-4">
+            <Clock className="w-5 h-5 text-accent" />
+            自分の時間
           </h3>
-          <MultiLinkBox 
-            name={hobby.comic.title} 
-            amazonTitle={hobby.comic.amazon_title}
-            asin={hobby.comic.asin} 
-            imageUrl={hobby.comic.image_url} 
-          />
-          <div className="text-sm text-ink-light leading-relaxed bg-cream/30 p-6 rounded-2xl border border-border-light">
+          <div className="text-sm text-ink-light">{formatParagraphsDark(hobby.duration)}</div>
+        </div>
+        <div className="bg-white p-6 rounded-2xl border border-border-light shadow-sm">
+          <h3 className="flex items-center gap-2 font-bold text-ink mb-4">
+            <Wallet className="w-5 h-5 text-accent" />
+            必要予算
+          </h3>
+          <div className="text-sm text-ink-light">{formatParagraphsDark(hobby.budget)}</div>
+        </div>
+      </div>
+
+      {/* ② 漫画セクション：description → MultiLinkBox の順 */}
+      {hobby.comic?.title && (
+        <div className="bg-white p-8 rounded-2xl border-l-8 border-l-accent border border-border-light shadow-sm mb-10">
+          <h3 className="flex items-center gap-2 font-bold text-ink mb-6">
+            <BookOpen className="w-5 h-5 text-accent" />
+            インスピレーション：『{hobby.comic.title}』
+          </h3>
+          {/* ② description を先に表示 */}
+          <div className="text-sm text-ink-light leading-relaxed mb-6">
             {formatParagraphsDark(hobby.comic.description)}
           </div>
+          {/* 購入ボタン（ASINがある場合のみ） */}
+          {hobby.comic.asin && (
+            <MultiLinkBox
+              name={hobby.comic.title}
+              amazonTitle={hobby.comic.amazon_title}
+              asin={hobby.comic.asin}
+              imageUrl={hobby.comic.image_url}
+            />
+          )}
         </div>
       )}
 
-      {/* YouTubeセクション */}
-      {hobby.youtube && (
-        <div className="mb-12">
-          <h3 className="font-bold text-ink mb-4 flex items-center gap-2">
-            <span className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-            </span>
-            まずは動画でイメージを膨らませる
-          </h3>
-          <a 
-            href={hobby.youtube.search_url} 
-            target="_blank" 
-            className="group relative block aspect-video rounded-2xl overflow-hidden bg-ink shadow-lg"
-          >
-            <Image src={hobby.youtube.thumbnail_url} alt="YouTube" fill className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
-                <svg viewBox="0 0 24 24" className="w-8 h-8 fill-white ml-1"><path d="M8 5v14l11-7z"/></svg>
-              </div>
-            </div>
-          </a>
-        </div>
-      )}
+      {/* ③ YouTube：元のpage.tsxと同じ方式 */}
+      <div className="bg-white p-8 rounded-2xl border border-border-light shadow-sm mb-10">
+        <h3 className="flex items-center gap-2 font-bold text-ink mb-4">
+          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-[#FF0000]">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+          </svg>
+          動画で学ぶ
+        </h3>
+        <p className="text-sm text-ink-light mb-5 leading-relaxed">
+          はじめてでも安心。動画で{hobby.name}の始め方やコツをチェックしてみましょう。
+        </p>
+        <a
+          href={youtube.search_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-3 px-6 py-3 rounded-full text-white font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
+          style={{ backgroundColor: '#FF0000' }}
+        >
+          動画を検索
+        </a>
+      </div>
 
-      {/* グッズセクション */}
+      {/* ④ おすすめグッズ：goods 紹介文 → MultiLinkBox の順 */}
       <div className="mb-16">
         <h3 className="flex items-center gap-2 font-bold text-ink mb-6">
           <ShoppingBag className="w-5 h-5 text-accent" />
-          おすすめのアイテム
+          おすすめグッズ
         </h3>
-        
-        {/* アイテムカード一覧 */}
+
+        {/* ④ goods 紹介文を先に表示 */}
+        <div className="text-sm text-ink-light leading-relaxed bg-white/50 p-6 rounded-2xl border border-dashed border-border-light mb-8">
+          {formatParagraphsDark(hobby.goods)}
+        </div>
+
+        {/* 購入ボタン一覧 */}
         {hobby.recommend_items && hobby.recommend_items.length > 0 && (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4">
             {hobby.recommend_items.map((item: any, i: number) => (
-              <MultiLinkBox 
-                key={i} 
+              <MultiLinkBox
+                key={i}
                 name={item.name}
                 amazonTitle={item.amazon_title}
-                asin={item.asin} 
-                imageUrl={item.image_url} 
+                asin={item.asin}
+                imageUrl={item.image_url}
               />
             ))}
           </div>
         )}
-
-        <div className="text-sm text-ink-light leading-relaxed bg-white/50 p-6 rounded-2xl border border-dashed border-border-light mt-6">
-          {formatParagraphsDark(hobby.goods)}
-        </div>
       </div>
 
       {/* AIパートナーセクション */}
@@ -245,16 +318,17 @@ export default async function HobbyDetail({ params }: { params: Promise<{ id: st
         </p>
       </div>
 
-      {/* 記録ボタン固定フッター */}
+      {/* 記録ボタン */}
       <div className="mt-12 flex justify-center pb-8">
-        <Link 
+        <Link
           href={`/records/new?hobbyId=${hobby.id}`}
-          className="flex items-center gap-3 px-8 py-4 bg-accent text-white rounded-full font-bold shadow-lg hover:scale-105 hover:shadow-accent/40 transition-all active:scale-95"
+          className="flex items-center gap-3 px-8 py-4 bg-accent text-white rounded-full font-bold shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300 transform"
         >
-          <PenLine className="w-5 h-5" />
+          <PenLine className="w-6 h-6" />
           この趣味を記録する
         </Link>
       </div>
+
     </div>
   );
 }

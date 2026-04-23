@@ -3,178 +3,15 @@ import path from 'path';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, Clock, Wallet, BookOpen, ShoppingBag, Sparkles, PenLine } from 'lucide-react';
+import { ArrowLeft, Clock, Wallet, BookOpen, ShoppingBag, Sparkles, ExternalLink, PenLine } from 'lucide-react';
 
 const AMAZON_TRACKING_ID = 'hobbyflow-22';
 
-const getAmazonUrl = (asin: string) =>
-  `https://www.amazon.co.jp/dp/${asin}?tag=${AMAZON_TRACKING_ID}`;
+const getAmazonUrl = (asin: string) => `https://www.amazon.co.jp/dp/${asin}?tag=${AMAZON_TRACKING_ID}`;
 
-// 商品名でそれぞれのショッピングサイトを検索するURL
-const getRakutenUrl = (name: string) =>
-  `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(name)}/`;
-
-const getYahooUrl = (name: string) =>
-  `https://shopping.yahoo.co.jp/search?p=${encodeURIComponent(name)}`;
-
-// ── マルチリンクボックス（漫画用） ──────────────────────────────
-function ComicLinkBox({
-  title,
-  asin,
-  imageUrl,
-}: {
-  title: string;
-  asin: string;
-  imageUrl?: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-border-light bg-white shadow-sm overflow-hidden">
-      <div className="flex gap-4 p-4 items-start">
-        {/* 書影 */}
-        <a
-          href={getAmazonUrl(asin)}
-          target="_blank"
-          rel="noopener noreferrer sponsored"
-          className="flex-shrink-0"
-        >
-          {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={imageUrl}
-              alt={title}
-              width={80}
-              height={114}
-              referrerPolicy="no-referrer"
-              className="rounded-lg border border-border-light shadow-sm object-cover w-[80px] h-[114px]"
-            />
-          ) : (
-            <div className="w-[80px] h-[114px] rounded-lg border border-dashed border-border-light bg-cream/50 flex items-center justify-center text-ink-light/40 text-xs text-center p-2">
-              画像準備中
-            </div>
-          )}
-        </a>
-
-        {/* タイトル＋ボタン */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-ink leading-snug mb-1 line-clamp-3">
-            {title}
-          </p>
-          <p className="text-[10px] text-ink-light/50 mb-3">PR・広告を含みます</p>
-
-          {/* ショッピングボタン */}
-          <div className="flex flex-wrap gap-2">
-            <a
-              href={getAmazonUrl(asin)}
-              target="_blank"
-              rel="noopener noreferrer sponsored"
-              className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: '#FF9900' }}
-            >
-              Amazon
-            </a>
-            <a
-              href={getRakutenUrl(title)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: '#BF0000' }}
-            >
-              楽天市場
-            </a>
-            <a
-              href={getYahooUrl(title)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: '#FF0033' }}
-            >
-              Yahoo!
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── マルチリンクボックス（グッズ用） ────────────────────────────
-function GoodsLinkBox({
-  name,
-  asin,
-  imageUrl,
-}: {
-  name: string;
-  asin: string;
-  imageUrl?: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-border-light bg-white shadow-sm overflow-hidden">
-      <div className="flex gap-4 p-4 items-start">
-        {/* 商品画像 */}
-        <a
-          href={getAmazonUrl(asin)}
-          target="_blank"
-          rel="noopener noreferrer sponsored"
-          className="flex-shrink-0"
-        >
-          {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={imageUrl}
-              alt={name}
-              width={80}
-              height={80}
-              referrerPolicy="no-referrer"
-              className="rounded-lg border border-border-light shadow-sm object-contain w-[80px] h-[80px] bg-white"
-            />
-          ) : (
-            <div className="w-[80px] h-[80px] rounded-lg border border-dashed border-border-light bg-cream/50 flex items-center justify-center text-ink-light/40 text-xs text-center p-2">
-              画像準備中
-            </div>
-          )}
-        </a>
-
-        {/* 商品名＋ボタン */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-ink leading-snug mb-1 line-clamp-2">
-            {name}
-          </p>
-          <p className="text-[10px] text-ink-light/50 mb-3">PR・広告を含みます</p>
-
-          <div className="flex flex-wrap gap-2">
-            <a
-              href={getAmazonUrl(asin)}
-              target="_blank"
-              rel="noopener noreferrer sponsored"
-              className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: '#FF9900' }}
-            >
-              Amazon
-            </a>
-            <a
-              href={getRakutenUrl(name)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: '#BF0000' }}
-            >
-              楽天市場
-            </a>
-            <a
-              href={getYahooUrl(name)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: '#FF0033' }}
-            >
-              Yahoo!
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+const getAmazonCoverUrl = (asin: string) => {
+  return `https://m.media-amazon.com/images/I/${asin}._AC_SS200_.jpg`;
+};
 
 
 export async function generateStaticParams() {
@@ -260,22 +97,31 @@ export default async function HobbyDetail({ params }: { params: Promise<{ id: st
 
       {hobby.comic?.title && (
         <div className="bg-white p-8 rounded-2xl border-l-8 border-l-accent border border-border-light shadow-sm mb-10">
-          <h3 className="flex items-center gap-2 font-bold text-ink mb-6">
-            <BookOpen className="w-5 h-5 text-accent" />
-            インスピレーション：『{hobby.comic.title}』
-          </h3>
-          {/* 紹介文 */}
-          <div className="text-sm text-ink-light leading-relaxed mb-6">
-            {formatParagraphsDark(hobby.comic.description)}
+          <h3 className="flex items-center gap-2 font-bold text-ink mb-6"><BookOpen className="w-5 h-5 text-accent" />インスピレーション：『{hobby.comic.title}』</h3>
+          <div className="flex gap-6 items-start">
+            {hobby.comic.asin && (
+              <a href={getAmazonUrl(hobby.comic.asin)} target="_blank" rel="noopener noreferrer sponsored" className="flex-shrink-0 flex flex-col items-center gap-2 group">
+                {hobby.comic.image_url ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={hobby.comic.image_url}
+                    alt={hobby.comic.title}
+                    width={90}
+                    height={128}
+                    referrerPolicy="no-referrer"
+                    className="rounded-lg shadow-md border border-border-light object-cover w-[90px] h-[128px]"
+                  />
+                ) : (
+                  <div className="w-[90px] h-[128px] rounded-lg border border-dashed border-border-light bg-cream/50 flex items-center justify-center text-ink-light/40 text-xs text-center p-2">
+                    画像準備中
+                  </div>
+                )}
+                <span className="text-xs text-accent flex items-center gap-0.5 group-hover:underline">Amazonで見る <ExternalLink className="w-3 h-3" /></span>
+                <span className="text-[10px] text-ink-light/60">PR</span>
+              </a>
+            )}
+            <div className="flex-1 text-sm text-ink-light leading-relaxed">{formatParagraphsDark(hobby.comic.description)}</div>
           </div>
-          {/* マルチリンクボックス */}
-          {hobby.comic.asin && (
-            <ComicLinkBox
-              title={hobby.comic.title}
-              asin={hobby.comic.asin}
-              imageUrl={hobby.comic.image_url}
-            />
-          )}
         </div>
       )}
 
@@ -298,21 +144,51 @@ export default async function HobbyDetail({ params }: { params: Promise<{ id: st
           おすすめグッズ
         </h3>
 
-        {/* goods 紹介文 */}
-        <div className="text-sm text-ink-light leading-relaxed bg-white/50 p-6 rounded-2xl border border-dashed border-border-light mb-6">
+        <div className="text-sm text-ink-light leading-relaxed bg-white/50 p-6 rounded-2xl border border-dashed border-border-light mb-8">
           {formatParagraphsDark(hobby.goods)}
         </div>
 
-        {/* マルチリンクボックス一覧 */}
         {hobby.recommend_items && hobby.recommend_items.length > 0 && (
-          <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
             {hobby.recommend_items.map((item: any, i: number) => (
-              <GoodsLinkBox
-                key={i}
-                name={item.name}
-                asin={item.asin}
-                imageUrl={item.image_url}
-              />
+              <div key={i} className="flex flex-col items-center group">
+                <a
+                  href={getAmazonUrl(item.asin)}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="flex-shrink-0 mb-3 block"
+                >
+                  {item.image_url ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={item.image_url}
+                      alt={item.name}
+                      width={160}
+                      height={160}
+                      referrerPolicy="no-referrer"
+                      className="rounded-lg shadow-md border border-border-light object-contain w-40 h-40 group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    /* 画像URLが未登録の場合はプレースホルダー */
+                    <div className="w-40 h-40 rounded-lg border border-dashed border-border-light bg-cream/50 flex items-center justify-center text-ink-light/40 text-xs text-center p-2">
+                      画像準備中
+                    </div>
+                  )}
+                </a>
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <span className="text-[12px] font-bold text-ink line-clamp-2 leading-snug h-9 px-2">
+                    {item.name}
+                  </span>
+                  <a
+                    href={getAmazonUrl(item.asin)}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    className="text-xs text-accent flex items-center gap-0.5 hover:underline"
+                  >
+                    Amazonで見る <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
             ))}
           </div>
         )}

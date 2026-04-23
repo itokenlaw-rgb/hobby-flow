@@ -38,7 +38,7 @@ function RecordForm() {
   ];
 
   const impressionOptions = [
-    'めちゃくちゃ楽しかった',
+    'めちゃくちゃ楽しかった！',
     'これ、ハマっちゃう予感…',
     'もっと早く始めればよかった！',
     'むずかしかったけど、そこが面白い！',
@@ -55,7 +55,6 @@ function RecordForm() {
     'しばらくいろいろやってみる！',
   ];
 
-  // ── ★ 複数選択のために配列（string[]）に変更 ──
   const [triggers, setTriggers] = useState<string[]>([]);
   const [impressions, setImpressions] = useState<string[]>([]);
   const [futures, setFutures] = useState<string[]>([]);
@@ -68,7 +67,6 @@ function RecordForm() {
   const [currentAiReaction, setCurrentAiReaction] = useState('');
   const photoInputRef = useRef<HTMLInputElement>(null);
 
-  // 複数選択用のトグル関数
   const toggleOption = (list: string[], setList: (val: string[]) => void, option: string) => {
     if (list.includes(option)) {
       setList(list.filter(i => i !== option));
@@ -77,17 +75,27 @@ function RecordForm() {
     }
   };
 
-  // ── メモ自動生成 ──
+  // ── ★ 改行ルールの修正 ──
   useEffect(() => {
     if (!isMemoEdited) {
       const contentParts = [];
       
-      if (triggers.length > 0) contentParts.push(triggers.join(' '));
-      contentParts.push(`【${hobbyName}をやってみた！】`);
-      if (impressions.length > 0) contentParts.push(impressions.join('\n'));
-      if (futures.length > 0) contentParts.push(futures.join('\n'));
+      // 1. きっかけグループ（スペースで繋ぎ、末尾に【やったみた！】を直結させる）
+      const triggerPart = triggers.length > 0 ? triggers.join(' ') + ' ' : '';
+      contentParts.push(`${triggerPart}【${hobbyName}をやってみた！】`);
 
-      const fullContent = contentParts.filter(Boolean).join('\n');
+      // 2. 感想グループ（グループ内は改行せず繋げる）
+      if (impressions.length > 0) {
+        contentParts.push(impressions.join(''));
+      }
+
+      // 3. 今後グループ（グループ内は改行せず繋げる）
+      if (futures.length > 0) {
+        contentParts.push(futures.join(''));
+      }
+
+      // 各グループの間を改行（\n）で結合する
+      const fullContent = contentParts.join('\n');
       setMemo(`${fullContent}\n\n#${hobbyName} #HobbyFlow`);
     }
   }, [triggers, impressions, futures, isMemoEdited, hobbyName]);
@@ -101,13 +109,11 @@ function RecordForm() {
     }
   };
 
-  // 保存処理
-  // 保存処理
   const handleSaveToHobbyFlow = () => {
     let username = localStorage.getItem('hobbyflow_username');
     if (!username) {
       username = prompt('記録を保存するためのユーザー名を入力してください（次回以降もログインに使います）');
-      if (!username) return; // キャンセルした場合は保存を中断
+      if (!username) return;
       localStorage.setItem('hobbyflow_username', username);
     }
 
@@ -121,7 +127,7 @@ function RecordForm() {
       memo,
       hasPhoto: !!photoPreview,
       date: new Date().toISOString(),
-      username: username, // ★ ユーザーデータを追加
+      username: username,
     };
     const existing = JSON.parse(localStorage.getItem('hobbyflow_records') || '[]');
     localStorage.setItem('hobbyflow_records', JSON.stringify([newRecord, ...existing]));
@@ -134,7 +140,6 @@ function RecordForm() {
     setShowAiModal(true);
   };
 
-
   return (
     <div className="max-w-2xl mx-auto px-4 pb-24 pt-8 animate-in fade-in duration-700">
       <Link href={hobbyId ? `/hobbies/${hobbyId}` : '/'} className="inline-flex items-center text-sm text-ink-light hover:text-ink transition-colors mb-6">
@@ -145,8 +150,6 @@ function RecordForm() {
       <p className="text-ink-light mb-8 text-sm">{hobbyName} を体験した記録を残しましょう。</p>
 
       <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-border-light space-y-8">
-
-        {/* きっかけ */}
         <section>
           <label className="block text-sm font-bold text-ink mb-3">きっかけ</label>
           <div className="flex flex-wrap gap-3">
@@ -166,7 +169,6 @@ function RecordForm() {
           「{hobbyName}をやってみた！」
         </div>
 
-        {/* 感想 */}
         <section>
           <label className="block text-sm font-bold text-ink mb-3">感想</label>
           <div className="flex flex-wrap gap-3">
@@ -182,7 +184,6 @@ function RecordForm() {
           </div>
         </section>
 
-        {/* 今後 */}
         <section>
           <label className="block text-sm font-bold text-ink mb-3">今後</label>
           <div className="flex flex-wrap gap-3">
@@ -198,7 +199,6 @@ function RecordForm() {
           </div>
         </section>
 
-        {/* 写真 */}
         <section>
           <label className="block text-sm font-bold text-ink mb-3">写真</label>
           <div className="flex items-start gap-4">
@@ -221,7 +221,6 @@ function RecordForm() {
           </div>
         </section>
 
-        {/* 投稿文 */}
         <section>
           <label className="block text-sm font-bold text-ink mb-1">投稿文</label>
           <p className="text-xs text-ink-light mb-3">ボタンを選ぶと自動で作成されます。自由に編集してもOKです。</p>
@@ -239,7 +238,6 @@ function RecordForm() {
           )}
         </section>
 
-        {/* アクションボタン */}
         <div className="pt-6 flex flex-col gap-4 border-t border-border-light border-dashed">
           <button onClick={() => setShowSnsModal(true)} className="w-full py-4 rounded-full bg-blue-500 text-white font-bold flex items-center justify-center gap-2 hover:bg-blue-600">
             <Share2 className="w-5 h-5" /> SNSで共有する
@@ -250,7 +248,6 @@ function RecordForm() {
         </div>
       </div>
 
-      {/* AIモーダル & SNSモーダル（以前のコードと同様のため省略可ですがロジックは保持しています） */}
       {showAiModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
           <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center animate-in zoom-in duration-300 shadow-2xl">

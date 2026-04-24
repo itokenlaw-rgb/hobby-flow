@@ -28,7 +28,7 @@ export default function RootLayout({
           <header className="px-8 py-6 border-b border-border-light flex justify-between items-end">
             <div>
               <h1 className="text-2xl font-bold tracking-widest text-ink">HobbyFlow</h1>
-              <p className="text-xs text-ink-light tracking-wider mt-1">自己との対話を記録する</p>
+              <p className="text-xs text-ink-light tracking-wider mt-1">新しい自分に、会いに行く</p>
             </div>
             <nav className="flex gap-6 text-ink-light text-sm">
               <Link href="/" className="flex flex-col items-center gap-1 hover:text-ink transition-colors">

@@ -10,11 +10,21 @@ const AMAZON_TRACKING_ID = 'hobbyflow-22';
 const getAmazonUrl = (asin: string) =>
   `https://www.amazon.co.jp/dp/${asin}?tag=${AMAZON_TRACKING_ID}`;
 
-const getRakutenUrl = (keyword: string) =>
-  `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(keyword)}/`;
+// ── もしもアフィリエイト設定 ─────────────────────────────────────
+const MOSHIMO_RAKUTEN_A_ID = '5507858';
+const MOSHIMO_YAHOO_A_ID   = '5507871';
 
-const getYahooUrl = (keyword: string) =>
-  `https://shopping.yahoo.co.jp/search?p=${encodeURIComponent(keyword)}`;
+// 楽天市場：もしもアフィリエイト経由（a_id/p_id/pc_id/pl_id は固定）
+const getRakutenUrl = (keyword: string) => {
+  const targetUrl = `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(keyword)}/`;
+  return `https://af.moshimo.com/af/c/click?a_id=${MOSHIMO_RAKUTEN_A_ID}&p_id=54&pc_id=54&pl_id=27059&url=${encodeURIComponent(targetUrl)}`;
+};
+
+// Yahoo!ショッピング：もしもアフィリエイト経由
+const getYahooUrl = (keyword: string) => {
+  const targetUrl = `https://shopping.yahoo.co.jp/search?first=1&p=${encodeURIComponent(keyword)}`;
+  return `https://af.moshimo.com/af/c/click?a_id=${MOSHIMO_YAHOO_A_ID}&p_id=1225&pc_id=1925&pl_id=27061&url=${encodeURIComponent(targetUrl)}`;
+};
 
 // ── マルチリンクボックス ─────────────────────────────────────────
 function MultiLinkBox({
@@ -70,7 +80,7 @@ function MultiLinkBox({
           <a
             href={getRakutenUrl(searchKeyword)}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer sponsored"
             className="flex-1 min-w-[80px] text-center py-2 px-3 rounded-lg text-[11px] font-bold text-white hover:opacity-90 transition-opacity"
             style={{ backgroundColor: '#BF0000' }}
           >
@@ -79,7 +89,7 @@ function MultiLinkBox({
           <a
             href={getYahooUrl(searchKeyword)}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer sponsored"
             className="flex-1 min-w-[80px] text-center py-2 px-3 rounded-lg text-[11px] font-bold text-white hover:opacity-90 transition-opacity"
             style={{ backgroundColor: '#4192D9' }}
           >

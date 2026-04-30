@@ -11,8 +11,8 @@ const getAmazonUrl = (asin: string) =>
   `https://www.amazon.co.jp/dp/${asin}?tag=${AMAZON_TRACKING_ID}`;
 
 // ── もしもアフィリエイト設定 ─────────────────────────────────────
-const MOSHIMO_RAKUTEN_A_ID = '5507858';
-const MOSHIMO_YAHOO_A_ID   = '5507871';
+const MOSHIMO_RAKUTEN_A_ID = '5519447';
+const MOSHIMO_YAHOO_A_ID   = '5519448';
 
 // 楽天市場：もしもアフィリエイト経由（a_id/p_id/pc_id/pl_id は固定）
 const getRakutenUrl = (keyword: string) => {

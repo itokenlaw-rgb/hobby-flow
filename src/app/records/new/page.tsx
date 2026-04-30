@@ -279,9 +279,6 @@ function RecordForm() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
 
 export default function RecordPage() {
   return (

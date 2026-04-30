@@ -326,3 +326,12 @@ export default function RecordsPage() {
     </div>
   );
 }
+
+      <footer className="w-full mt-20 pb-10 flex justify-center border-t border-border-light/30 pt-10">
+        <Link href="/policy" className="text-xs text-ink-light hover:text-accent transition-colors underline underline-offset-4">
+          プライバシーポリシー・アマゾンアソシエイトについて
+        </Link>
+      </footer>
+    </div>
+  );
+}

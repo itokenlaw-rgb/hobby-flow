@@ -317,15 +317,12 @@ export default function RecordsPage() {
                   {record.futures?.map((t: string) => (
                     <span key={`fu-${t}`} className="px-2 py-1 bg-ink text-white rounded border border-ink">次: {t}</span>
                   ))}
-                </div>
+</div>
               </div>
             ))}
           </div>
         )}
       </div>
-    </div>
-  );
-}
 
       <footer className="w-full mt-20 pb-10 flex justify-center border-t border-border-light/30 pt-10">
         <Link href="/policy" className="text-xs text-ink-light hover:text-accent transition-colors underline underline-offset-4">

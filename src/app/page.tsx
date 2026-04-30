@@ -273,10 +273,9 @@ export default function ExplorePage() {
                         </div>
                       </div>
                     </div>
-
                   </div>
                 </Link>
-              );
+);
             })}
           </div>
         </div>

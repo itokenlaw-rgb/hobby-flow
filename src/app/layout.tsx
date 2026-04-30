@@ -47,6 +47,19 @@ export default function RootLayout({
           <main className="flex-1 px-8 py-10 pb-24">
             {children}
           </main>
+
+          {/* Footer */}
+          <footer className="border-t border-border-light/50 px-8 py-6 text-center">
+            <p className="text-[11px] text-ink-light/60 mb-2">
+              当サイトはAmazonアソシエイト・プログラム、もしもアフィリエイト（楽天市場・Yahoo!ショッピング）の参加者です。
+            </p>
+            <Link
+              href="/policy"
+              className="text-[11px] text-ink-light/70 hover:text-accent transition-colors underline underline-offset-4"
+            >
+              プライバシーポリシー・アフィリエイトについて
+            </Link>
+          </footer>
         </div>
       </body>
     </html>

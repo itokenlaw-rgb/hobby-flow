@@ -3,7 +3,7 @@
 import { useState, useRef, Suspense, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Camera, Save, Sparkles, X, Share2, Mail, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Camera, Save, Sparkles, X, Share2, MessageCircle } from 'lucide-react';
 import { aiReactions } from '@/data/aiReactions';
 import hobbiesData from '@/data/hobbies.json';
 
@@ -58,7 +58,6 @@ function RecordForm() {
   const [triggers, setTriggers] = useState<string[]>([]);
   const [impressions, setImpressions] = useState<string[]>([]);
   const [futures, setFutures] = useState<string[]>([]);
-  
   const [memo, setMemo] = useState('');
   const [isMemoEdited, setIsMemoEdited] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -75,26 +74,13 @@ function RecordForm() {
     }
   };
 
-  // ── ★ 改行ルールの修正 ──
   useEffect(() => {
     if (!isMemoEdited) {
       const contentParts = [];
-      
-      // 1. きっかけグループ（スペースで繋ぎ、末尾に【やったみた！】を直結させる）
       const triggerPart = triggers.length > 0 ? triggers.join(' ') + ' ' : '';
       contentParts.push(`${triggerPart}【${hobbyName}をやってみた！】`);
-
-      // 2. 感想グループ（グループ内は改行せず繋げる）
-      if (impressions.length > 0) {
-        contentParts.push(impressions.join(''));
-      }
-
-      // 3. 今後グループ（グループ内は改行せず繋げる）
-      if (futures.length > 0) {
-        contentParts.push(futures.join(''));
-      }
-
-      // 各グループの間を改行（\n）で結合する
+      if (impressions.length > 0) contentParts.push(impressions.join(''));
+      if (futures.length > 0) contentParts.push(futures.join(''));
       const fullContent = contentParts.join('\n');
       setMemo(`${fullContent}\n\n#${hobbyName} #HobbyFlow`);
     }
@@ -110,31 +96,31 @@ function RecordForm() {
   };
 
   const handleSaveToHobbyFlow = () => {
-    let username = localStorage.getItem('hobbyflow_username');
+    const username = localStorage.getItem('hobbyflow_username');
     if (!username) {
-      username = prompt('記録を保存するためのユーザー名を入力してください（次回以降もログインに使います）');
-      if (!username) return;
-      localStorage.setItem('hobbyflow_username', username);
+      alert('ログインが必要です。記録一覧画面からログインしてください。');
+      router.push('/records');
+      return;
     }
 
     const newRecord = {
       id: Date.now(),
       hobbyId,
       hobbyName,
-      triggers,
-      impressions,
-      futures,
       memo,
       hasPhoto: !!photoPreview,
       date: new Date().toISOString(),
       username: username,
+      triggers,
+      impressions,
+      futures
     };
     const existing = JSON.parse(localStorage.getItem('hobbyflow_records') || '[]');
     localStorage.setItem('hobbyflow_records', JSON.stringify([newRecord, ...existing]));
 
     const randomIdx = Math.floor(Math.random() * aiReactions.length);
     const reaction = (aiReactions as any)[randomIdx];
-    const reactionText = typeof reaction === 'object' && reaction !== null ? reaction.text : reaction;
+    const reactionText = typeof reaction === 'object' ? reaction.text : reaction;
 
     setCurrentAiReaction(reactionText);
     setShowAiModal(true);
@@ -154,32 +140,22 @@ function RecordForm() {
           <label className="block text-sm font-bold text-ink mb-3">きっかけ</label>
           <div className="flex flex-wrap gap-3">
             {triggerOptions.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => toggleOption(triggers, setTriggers, opt)}
+              <button key={opt} onClick={() => toggleOption(triggers, setTriggers, opt)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   triggers.includes(opt) ? 'bg-ink text-white shadow-md' : 'bg-cream text-ink-light border border-border-light'
-                }`}
-              >{opt}</button>
+                }`}>{opt}</button>
             ))}
           </div>
         </section>
-
-        <div className="mt-4 p-4 bg-cream/50 rounded-xl text-center text-ink font-bold">
-          「{hobbyName}をやってみた！」
-        </div>
 
         <section>
           <label className="block text-sm font-bold text-ink mb-3">感想</label>
           <div className="flex flex-wrap gap-3">
             {impressionOptions.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => toggleOption(impressions, setImpressions, opt)}
+              <button key={opt} onClick={() => toggleOption(impressions, setImpressions, opt)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   impressions.includes(opt) ? 'bg-accent text-white shadow-md' : 'bg-cream text-ink-light border border-border-light'
-                }`}
-              >{opt}</button>
+                }`}>{opt}</button>
             ))}
           </div>
         </section>
@@ -188,13 +164,10 @@ function RecordForm() {
           <label className="block text-sm font-bold text-ink mb-3">今後</label>
           <div className="flex flex-wrap gap-3">
             {futureOptions.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => toggleOption(futures, setFutures, opt)}
+              <button key={opt} onClick={() => toggleOption(futures, setFutures, opt)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   futures.includes(opt) ? 'bg-ink text-white shadow-md' : 'bg-cream text-ink-light border border-border-light'
-                }`}
-              >{opt}</button>
+                }`}>{opt}</button>
             ))}
           </div>
         </section>
@@ -202,20 +175,14 @@ function RecordForm() {
         <section>
           <label className="block text-sm font-bold text-ink mb-3">写真</label>
           <div className="flex items-start gap-4">
-            <button
-              onClick={() => photoInputRef.current?.click()}
-              className="flex flex-col items-center justify-center w-24 h-24 rounded-2xl border-2 border-dashed border-border-light bg-cream hover:bg-border-light/30 text-ink-light transition-colors"
-            >
-              <Camera className="w-8 h-8 mb-1" />
-              <span className="text-xs">写真を追加</span>
+            <button onClick={() => photoInputRef.current?.click()} className="flex flex-col items-center justify-center w-24 h-24 rounded-2xl border-2 border-dashed border-border-light bg-cream hover:bg-border-light/30 text-ink-light transition-colors">
+              <Camera className="w-8 h-8 mb-1" /><span className="text-xs">写真を追加</span>
             </button>
             <input type="file" accept="image/*" hidden ref={photoInputRef} onChange={handlePhotoChange} />
             {photoPreview && (
               <div className="relative w-24 h-24 rounded-2xl overflow-hidden border border-border-light">
                 <img src={photoPreview} alt="プレビュー" className="w-full h-full object-cover" />
-                <button onClick={() => setPhotoPreview(null)} className="absolute top-1 right-1 bg-black/50 p-1 rounded-full text-white hover:bg-black/70">
-                  <X className="w-3 h-3" />
-                </button>
+                <button onClick={() => setPhotoPreview(null)} className="absolute top-1 right-1 bg-black/50 p-1 rounded-full text-white hover:bg-black/70"><X className="w-3 h-3" /></button>
               </div>
             )}
           </div>
@@ -223,15 +190,10 @@ function RecordForm() {
 
         <section>
           <label className="block text-sm font-bold text-ink mb-1">投稿文</label>
-          <p className="text-xs text-ink-light mb-3">ボタンを選ぶと自動で作成されます。自由に編集してもOKです。</p>
           <textarea
             value={memo}
-            onChange={(e) => {
-              setMemo(e.target.value);
-              setIsMemoEdited(true);
-            }}
-            placeholder={`「${hobbyName}をやってみた！」\n\n#${hobbyName} #HobbyFlow`}
-            className="w-full p-4 rounded-2xl bg-cream border border-border-light text-ink placeholder:text-ink-light/40 min-h-[160px] focus:outline-none focus:ring-2 focus:ring-accent/50 leading-relaxed text-sm"
+            onChange={(e) => { setMemo(e.target.value); setIsMemoEdited(true); }}
+            className="w-full p-4 rounded-2xl bg-cream border border-border-light text-ink min-h-[160px] focus:outline-none focus:ring-2 focus:ring-accent/50 leading-relaxed text-sm"
           />
           {isMemoEdited && (
             <button onClick={() => setIsMemoEdited(false)} className="mt-2 text-xs text-accent hover:underline">↩ 自動生成に戻す</button>
@@ -239,10 +201,10 @@ function RecordForm() {
         </section>
 
         <div className="pt-6 flex flex-col gap-4 border-t border-border-light border-dashed">
-          <button onClick={() => setShowSnsModal(true)} className="w-full py-4 rounded-full bg-blue-500 text-white font-bold flex items-center justify-center gap-2 hover:bg-blue-600">
+          <button onClick={() => setShowSnsModal(true)} className="w-full py-4 rounded-full bg-blue-500 text-white font-bold flex items-center justify-center gap-2">
             <Share2 className="w-5 h-5" /> SNSで共有する
           </button>
-          <button onClick={handleSaveToHobbyFlow} className="w-full py-4 rounded-full bg-ink text-white font-bold flex items-center justify-center gap-2 hover:bg-ink/90">
+          <button onClick={handleSaveToHobbyFlow} className="w-full py-4 rounded-full bg-ink text-white font-bold flex items-center justify-center gap-2">
             <Save className="w-5 h-5" /> HobbyFlowに記録する
           </button>
         </div>
@@ -250,21 +212,18 @@ function RecordForm() {
 
       {showAiModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center animate-in zoom-in duration-300 shadow-2xl">
+          <div className="bg-white rounded-3xl p-8 max-sm w-full text-center shadow-2xl">
             <Sparkles className="w-12 h-12 text-accent mx-auto mb-4" />
             <h3 className="text-xl font-bold text-ink mb-6">AIパートナーから</h3>
-            <p className="text-base text-ink font-serif leading-relaxed italic mb-8">「{currentAiReaction}」</p>
-            <div className="flex flex-col gap-3">
-              <button onClick={() => { setShowAiModal(false); router.push('/records'); }} className="w-full py-3 rounded-full bg-ink text-white font-bold">一覧を見る</button>
-              <button onClick={() => { setShowAiModal(false); setShowSnsModal(true); }} className="w-full py-3 rounded-full border border-blue-400 text-blue-500 font-bold hover:bg-blue-50">SNSにも発信する</button>
-            </div>
+            <p className="text-base text-ink italic mb-8">「{currentAiReaction}」</p>
+            <button onClick={() => router.push('/records')} className="w-full py-3 rounded-full bg-ink text-white font-bold">一覧を見る</button>
           </div>
         </div>
       )}
 
       {showSnsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowSnsModal(false)}>
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center animate-in zoom-in shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-ink">SNSで共有する</h3>
               <button onClick={() => setShowSnsModal(false)} className="p-1 rounded-full hover:bg-black/10"><X className="w-5 h-5 text-ink-light" /></button>
@@ -280,19 +239,19 @@ function RecordForm() {
         </div>
       )}
 
-export default function RecordPage() {
-  return (
-    <Suspense fallback={<div className="p-8 text-center text-ink-light">読み込み中...</div>}>
-      <RecordForm />
-    </Suspense>
-  );
-}
-
       <footer className="w-full mt-20 pb-10 flex justify-center border-t border-border-light/30 pt-10">
         <Link href="/policy" className="text-xs text-ink-light hover:text-accent transition-colors underline underline-offset-4">
           プライバシーポリシー・アマゾンアソシエイトについて
         </Link>
       </footer>
     </div>
+  );
+}
+
+export default function RecordPage() {
+  return (
+    <Suspense fallback={<div className="p-20 text-center">読み込み中...</div>}>
+      <RecordForm />
+    </Suspense>
   );
 }

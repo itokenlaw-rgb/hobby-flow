@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Clock, Wallet, BookOpen, ShoppingBag, Sparkles, PenLine } from 'lucide-react';
+import MossimoLinkBox from '@/components/MossimoLinkBox';
 
 const AMAZON_TRACKING_ID = 'hobbyflow-22';
 
@@ -101,7 +102,6 @@ function MultiLinkBox({
   );
 }
 
-// ── テキストフォーマット（元のpage.tsxと同じ実装）────────────────
 const formatTextWithBold = (text: string, color: string) => {
   if (!text) return null;
   return text.split(/(<<.*?>>)/g).map((part, i) => {
@@ -243,25 +243,27 @@ export default async function HobbyDetail({
         </div>
       </div>
 
-      {/* ② 漫画セクション：description → MultiLinkBox の順 */}
+      {/* ② 漫画セクション：description → リンクボックス の順 */}
       {hobby.comic?.title && (
         <div className="bg-white p-8 rounded-2xl border-l-8 border-l-accent border border-border-light shadow-sm mb-10">
           <h3 className="flex items-center gap-2 font-bold text-ink mb-6">
             <BookOpen className="w-5 h-5 text-accent" />
             インスピレーション：『{hobby.comic.title}』
           </h3>
-          {/* ② description を先に表示 */}
+          {/* description を先に表示 */}
           <div className="text-sm text-ink-light leading-relaxed mb-6">
             {formatParagraphsDark(hobby.comic.description)}
           </div>
-          {/* 購入ボタン（ASINがある場合のみ） */}
+          {/* もしもアフィリエイトHTMLがあればそちらを優先、なければ自前ボタン */}
           {hobby.comic.asin && (
-            <MultiLinkBox
-              name={hobby.comic.title}
-              amazonTitle={hobby.comic.amazon_title}
-              asin={hobby.comic.asin}
-              imageUrl={hobby.comic.image_url}
-            />
+            hobby.comic.msmaflink_html
+              ? <MossimoLinkBox html={hobby.comic.msmaflink_html} />
+              : <MultiLinkBox
+                  name={hobby.comic.title}
+                  amazonTitle={hobby.comic.amazon_title}
+                  asin={hobby.comic.asin}
+                  imageUrl={hobby.comic.image_url}
+                />
           )}
         </div>
       )}
@@ -300,17 +302,19 @@ export default async function HobbyDetail({
           {formatParagraphsDark(hobby.goods)}
         </div>
 
-        {/* 購入ボタン一覧 */}
+        {/* 購入ボタン一覧：もしもHTMLがあれば優先、なければ自前ボタン */}
         {hobby.recommend_items && hobby.recommend_items.length > 0 && (
           <div className="flex flex-col gap-4">
             {hobby.recommend_items.map((item: any, i: number) => (
-              <MultiLinkBox
-                key={i}
-                name={item.name}
-                amazonTitle={item.amazon_title}
-                asin={item.asin}
-                imageUrl={item.image_url}
-              />
+              item.msmaflink_html
+                ? <MossimoLinkBox key={i} html={item.msmaflink_html} />
+                : <MultiLinkBox
+                    key={i}
+                    name={item.name}
+                    amazonTitle={item.amazon_title}
+                    asin={item.asin}
+                    imageUrl={item.image_url}
+                  />
             ))}
           </div>
         )}

@@ -203,13 +203,13 @@ export default function ExplorePage() {
                 onClick={() => handleViewAll('indoor')} 
                 className="px-4 py-1.5 text-[11px] text-ink-light hover:text-ink hover:bg-cream border border-border-light rounded-full transition-all"
               >
-                インドアを全部みる
+                インドアの趣味を全部みる
               </button>
               <button 
                 onClick={() => handleViewAll('outdoor')} 
                 className="px-4 py-1.5 text-[11px] text-ink-light hover:text-ink hover:bg-cream border border-border-light rounded-full transition-all"
               >
-                アウトドアを全部みる
+                アウトドアの趣味を全部みる
               </button>
             </div>
           </div>

@@ -194,6 +194,8 @@ export default function ExplorePage() {
               <Search className="w-5 h-5 text-accent" />趣味を探す！
             </button>
 
+          </div>
+        </div>
             {/* ── ★ 追加した一括表示ボタン ── */}
             <div className="flex gap-4">
               <button 
@@ -209,8 +211,6 @@ export default function ExplorePage() {
                 アウトドアの趣味を全部みる
               </button>
             </div>
-          </div>
-        </div>
       </div>
 
       {hasSearched && (

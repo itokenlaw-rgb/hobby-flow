@@ -88,16 +88,30 @@ export default function PolicyPage() {
             </p>
           </section>
 
-          {/* ─── 5. お問い合わせ ─── */}
-          <section>
-            <h2 className="text-base font-bold text-ink mb-4 pb-2 border-b border-border-light flex items-center gap-2">
-              <Mail className="w-5 h-5 text-accent" />
-              お問い合わせ
-            </h2>
-            <p>
-              当サイトへのご意見・ご質問等がございましたら、運営者のSNSアカウント等を通じてご連絡ください。
-            </p>
-          </section>
+{/* ─── 5. お問い合わせ ─── */}
+<section>
+  <h2 className="text-base font-bold text-ink mb-4 pb-2 border-b border-border-light flex items-center gap-2">
+    <Mail className="w-5 h-5 text-accent" />
+    お問い合わせ
+  </h2>
+  <div className="space-y-4">
+    <p>
+      当サイト「HobbyFlow」に関するご意見・ご質問、または著作権等に関するお問い合わせは、以下の「お問い合わせフォーム」よりご連絡ください。
+    </p>
+    <div className="pt-2">
+      <a 
+        href="https://forms.gle/LuhHqKe4ibvTFzKM9" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 px-6 py-3 bg-ink text-white rounded-full font-bold text-sm hover:bg-ink/80 transition-all shadow-sm"
+      >
+        <Mail className="w-4 h-4" />
+        お問い合わせフォームを開く
+      </a>
+    </div>
+  </div>
+</section>
+
 
         </div>
       </div>

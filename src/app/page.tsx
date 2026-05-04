@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Users, Search, Sparkles, Coffee, Map, Palette, Dumbbell } from 'lucide-react';
+import { Users, Search, Sparkles, Coffee, Map, Palette } from 'lucide-react';
 import hobbiesData from '@/data/hobbies.json';
 
 const shuffleArray = (array: any[]) => {
@@ -23,14 +23,12 @@ const getHobbyIcon = (tags: string[]) => {
   return <Sparkles className="w-5 h-5" />;
 };
 
-// hobbies内インデックスから画像URLを生成
 const getHobbyImageUrl = (hobbyId: string): string | null => {
   const index = (hobbiesData as any[]).findIndex((h) => h.id === hobbyId);
   if (index < 0 || index >= 99) return null; 
   const num = String(index + 1).padStart(3, '0');
   return `/hobby_image_${num}.jpg`;
 };
-
 
 function ComingSoonModal({ onClose }: { onClose: () => void }) {
   return (
@@ -53,23 +51,39 @@ export default function ExplorePage() {
   const [results, setResults] = useState<any[]>([]);
   const [showComingSoon, setShowComingSoon] = useState(false);
 
+  // ── ★ 一括表示用のハンドラー ──
+  const handleViewAll = (type: 'indoor' | 'outdoor') => {
+    const tagName = type === 'indoor' ? 'インドア' : 'アウトドア';
+    const all = hobbiesData as any[];
+    
+    // フィルター：場所のみ一致させ、他は無視
+    const filtered = all.filter(h => h.tags?.includes(tagName));
+    
+    // ステートのリセットと設定
+    setLocation(type);
+    setCost(null);
+    setTime(null);
+    setResults(shuffleArray(filtered)); // 全件表示
+    setHasSearched(true);
+
+    // スクロール
+    setTimeout(() => {
+      const el = document.getElementById('results-area');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+
   const handleSearch = () => {
     const TARGET = 8;
     const all = hobbiesData as any[];
 
-    // ── 場所マッチ ──
     const matchesLocation = (hobby: any) => {
       const tags = hobby.tags || [];
-      // ★ 正しいタグ名「アウトドア」「インドア」を使用
       if (location === 'indoor'  && !tags.includes('インドア'))  return false;
       if (location === 'outdoor' && !tags.includes('アウトドア')) return false;
       return true;
     };
 
-    // ── 時間スコア ──
-    // サクッと: 時間小=2, 時間中=1, 時間大=除外
-    // じっくり: 時間大=2, 時間中=1, 時間小=除外
-    // 未選択:   全て=1
     const getTimeScore = (tags: string[]): number => {
       if (time === 'short') {
         if (tags.includes('時間小')) return 2;
@@ -84,10 +98,6 @@ export default function ExplorePage() {
       return 1;
     };
 
-    // ── 費用スコア ──
-    // お手軽:   費用小=2, 費用中=1, 費用大=除外
-    // ゴージャス: 費用大=2, 費用中=1, 費用小=除外
-    // 未選択:   全て=1
     const getCostScore = (tags: string[]): number => {
       if (cost === 'low') {
         if (tags.includes('費用小')) return 2;
@@ -102,7 +112,6 @@ export default function ExplorePage() {
       return 1;
     };
 
-    // ── STEP 1: 場所＋時間＋費用すべてスコア計算（-1は除外） ──
     let scored = shuffleArray(all)
       .filter(matchesLocation)
       .map((hobby: any) => ({
@@ -111,24 +120,13 @@ export default function ExplorePage() {
       }))
       .filter(({ score }) => score >= 0);
 
-    // スコア降順ソート
     scored.sort((a, b) => b.score - a.score);
     let finalList = scored.map(({ hobby }) => hobby);
 
-    // ── STEP 2: 件数が TARGET 未満なら場所だけ残して時間・費用の「中」制約を外す ──
     if (finalList.length < TARGET) {
       const usedIds = new Set(finalList.map((h: any) => h.id));
       const supplement = shuffleArray(
         all.filter((h: any) => matchesLocation(h) && !usedIds.has(h.id))
-      );
-      finalList = [...finalList, ...supplement];
-    }
-
-    // ── STEP 3: それでも足りなければ場所制約も外す ──
-    if (finalList.length < TARGET) {
-      const usedIds = new Set(finalList.map((h: any) => h.id));
-      const supplement = shuffleArray(
-        all.filter((h: any) => !usedIds.has(h.id))
       );
       finalList = [...finalList, ...supplement];
     }
@@ -162,69 +160,41 @@ export default function ExplorePage() {
 
         <div className="w-full space-y-8 bg-white p-8 rounded-3xl shadow-sm border border-border-light relative z-10">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-
             {/* 場所 */}
             <div className="flex flex-col gap-3">
               <label className="text-xs text-ink-light text-center font-bold">場所</label>
               <div className="flex rounded-full border border-border-light overflow-hidden">
-                <button
-                  onClick={() => setLocation(location === 'indoor' ? null : 'indoor')}
-                  className={`flex-1 py-2.5 text-sm font-medium transition-all ${location === 'indoor' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}
-                >インドア</button>
+                <button onClick={() => setLocation(location === 'indoor' ? null : 'indoor')} className={`flex-1 py-2.5 text-sm font-medium transition-all ${location === 'indoor' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}>インドア</button>
                 <div className="w-px bg-border-light" />
-                <button
-                  onClick={() => setLocation(location === 'outdoor' ? null : 'outdoor')}
-                  className={`flex-1 py-2.5 text-sm font-medium transition-all ${location === 'outdoor' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}
-                >アウトドア</button>
+                <button onClick={() => setLocation(location === 'outdoor' ? null : 'outdoor')} className={`flex-1 py-2.5 text-sm font-medium transition-all ${location === 'outdoor' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}>アウトドア</button>
               </div>
             </div>
-
             {/* 費用 */}
             <div className="flex flex-col gap-3">
               <label className="text-xs text-ink-light text-center font-bold">費用</label>
               <div className="flex rounded-full border border-border-light overflow-hidden">
-                <button
-                  onClick={() => setCost(cost === 'low' ? null : 'low')}
-                  className={`flex-1 py-2.5 text-sm font-medium transition-all ${cost === 'low' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}
-                >お手軽</button>
+                <button onClick={() => setCost(cost === 'low' ? null : 'low')} className={`flex-1 py-2.5 text-sm font-medium transition-all ${cost === 'low' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}>お手軽</button>
                 <div className="w-px bg-border-light" />
-                <button
-                  onClick={() => setCost(cost === 'high' ? null : 'high')}
-                  className={`flex-1 py-2.5 text-sm font-medium transition-all ${cost === 'high' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}
-                >ゴージャス</button>
+                <button onClick={() => setCost(cost === 'high' ? null : 'high')} className={`flex-1 py-2.5 text-sm font-medium transition-all ${cost === 'high' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}>ゴージャス</button>
               </div>
             </div>
-
             {/* 時間 */}
             <div className="flex flex-col gap-3">
               <label className="text-xs text-ink-light text-center font-bold">時間</label>
               <div className="flex rounded-full border border-border-light overflow-hidden">
-                <button
-                  onClick={() => setTime(time === 'short' ? null : 'short')}
-                  className={`flex-1 py-2.5 text-sm font-medium transition-all ${time === 'short' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}
-                >サクッと</button>
+                <button onClick={() => setTime(time === 'short' ? null : 'short')} className={`flex-1 py-2.5 text-sm font-medium transition-all ${time === 'short' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}>サクッと</button>
                 <div className="w-px bg-border-light" />
-                <button
-                  onClick={() => setTime(time === 'long' ? null : 'long')}
-                  className={`flex-1 py-2.5 text-sm font-medium transition-all ${time === 'long' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}
-                >じっくり</button>
+                <button onClick={() => setTime(time === 'long' ? null : 'long')} className={`flex-1 py-2.5 text-sm font-medium transition-all ${time === 'long' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}>じっくり</button>
               </div>
             </div>
-
           </div>
 
-          <div className="pt-4 flex justify-center">
-            <button
-              onClick={handleSearch}
-              className="px-10 py-4 bg-ink text-cream rounded-full font-bold shadow-md hover:scale-105 transition-all flex items-center gap-2 group text-lg"
-            >
+          <div className="pt-4 flex flex-col items-center gap-6">
+            <button onClick={handleSearch} className="px-10 py-4 bg-ink text-cream rounded-full font-bold shadow-md hover:scale-105 transition-all flex items-center gap-2 group text-lg">
               <Search className="w-5 h-5 text-accent" />趣味を探す！
             </button>
-          </div>
-        </div>
-      </div>
 
-{/* ── ★ 追加した一括表示ボタン ── */}
+            {/* ── ★ 追加した一括表示ボタン ── */}
             <div className="flex gap-4">
               <button 
                 onClick={() => handleViewAll('indoor')}
@@ -243,8 +213,6 @@ export default function ExplorePage() {
         </div>
       </div>
 
-
-      {/* 検索結果 */}
       {hasSearched && (
         <div id="results-area" className="w-full mt-16 animate-in slide-in-from-bottom-8 fade-in duration-1000 scroll-mt-10">
           <div className="text-center mb-10">
@@ -258,16 +226,9 @@ export default function ExplorePage() {
               return (
                 <Link href={`/hobbies/${hobby.id}`} key={hobby.id} className="block group" style={{ animationDelay: `${index * 100}ms` }}>
                   <div className="relative p-6 bg-white rounded-2xl shadow-sm border border-border-light transition-all hover:shadow-md hover:-translate-y-2 flex flex-col h-full overflow-hidden">
-
-                    {/* 背景画像（薄く） */}
                     {imageUrl && (
-                      <div
-                        className="absolute inset-0 rounded-2xl bg-cover bg-center pointer-events-none"
-                        style={{ backgroundImage: `url(${imageUrl})`, opacity: 0.12 }}
-                      />
+                      <div className="absolute inset-0 rounded-2xl bg-cover bg-center pointer-events-none" style={{ backgroundImage: `url(${imageUrl})`, opacity: 0.12 }} />
                     )}
-
-                    {/* カードコンテンツ */}
                     <div className="relative z-10 flex flex-col h-full">
                       <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 rounded-full bg-cream flex items-center justify-center text-accent border border-border-light">
@@ -275,17 +236,14 @@ export default function ExplorePage() {
                         </div>
                         <h4 className="text-lg font-bold text-ink group-hover:text-accent">{hobby.name}</h4>
                       </div>
-
                       <p className="text-sm text-ink-light leading-relaxed mb-6 flex-1 italic">
                         「{renderFirstLineWithBold(hobby.pitch)}」
                       </p>
-
                       <div className="flex items-center gap-2 mb-4 text-xs">
                         {hobby.tags?.map((t: string) => (
                           <span key={t} className="px-2 py-1 bg-cream rounded border border-border-light/50 text-ink-light">{t}</span>
                         ))}
                       </div>
-
                       <div className="flex items-center justify-between mt-auto pt-4 border-t border-border-light border-dashed">
                         <div className="flex items-center gap-1.5 text-xs text-ink-light">
                           <Users className="w-3.5 h-3.5" />
@@ -295,7 +253,7 @@ export default function ExplorePage() {
                     </div>
                   </div>
                 </Link>
-);
+              );
             })}
           </div>
         </div>

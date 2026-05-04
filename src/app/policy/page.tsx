@@ -99,7 +99,7 @@ export default function PolicyPage() {
               </p>
               <div className="pt-2">
                 <a 
-                  href="https://forms.gle/LuhHqKe4ibvTFzKM9" 
+                  href="https://forms.gle/j35GAmCS6uhSxdc97" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-ink text-white rounded-full font-bold text-sm hover:bg-ink/80 transition-all shadow-sm"

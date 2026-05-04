@@ -196,23 +196,23 @@ export default function ExplorePage() {
 
           </div>
         </div>
-            {/* ── ★ 追加した一括表示ボタン ── */}
-            <div className="flex gap-4">
+
+{/* ── ★ 隙間をあけ、カプセル型の枠を追加した一括表示ボタン ── */}
+            <div className="flex gap-3 mt-2">
               <button 
-                onClick={() => handleViewAll('indoor')}
-                className="text-xs text-ink-light hover:text-ink underline underline-offset-4 decoration-border-light transition-colors"
+                onClick={() => handleViewAll('indoor')} 
+                className="px-4 py-1.5 text-[11px] text-ink-light hover:text-ink hover:bg-cream border border-border-light rounded-full transition-all"
               >
-                インドアの趣味を全部みる
+                インドアを全部みる
               </button>
               <button 
-                onClick={() => handleViewAll('outdoor')}
-                className="text-xs text-ink-light hover:text-ink underline underline-offset-4 decoration-border-light transition-colors"
+                onClick={() => handleViewAll('outdoor')} 
+                className="px-4 py-1.5 text-[11px] text-ink-light hover:text-ink hover:bg-cream border border-border-light rounded-full transition-all"
               >
-                アウトドアの趣味を全部みる
+                アウトドアを全部みる
               </button>
             </div>
-
-      </div>
+          </div>
 
       {hasSearched && (
         <div id="results-area" className="w-full mt-16 animate-in slide-in-from-bottom-8 fade-in duration-1000 scroll-mt-10">

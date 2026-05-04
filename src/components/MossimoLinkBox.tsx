@@ -4,43 +4,49 @@ import { useEffect } from 'react';
 
 export default function MossimoLinkBox({ html }: { html: string }) {
   useEffect(() => {
-    // 既存のスクリプトを一旦削除して、確実に再実行させる
+    // msmaflinkを呼び出す共通関数
+    const triggerMoshimo = () => {
+      if (typeof (window as any).msmaflink === 'function') {
+        (window as any).msmaflink();
+      }
+    };
+
     const scriptId = 'moshimo-js-sdk';
     const existingScript = document.getElementById(scriptId);
-    if (existingScript) {
-      existingScript.remove();
+
+    if (!existingScript) {
+      // 1. スクリプトが存在しない場合（初回読み込み時）
+      const script = document.createElement('script');
+      script.id = scriptId;
+      script.src = "//dn.msmstatic.com/site/cardlink/bundle.js?20220329";
+      script.async = true;
+      script.onload = triggerMoshimo;
+      document.body.appendChild(script);
+    } else {
+      // 2. スクリプトがすでに存在する場合（SPA遷移時）
+      // DOMが更新されるのを待ってから関数を直接叩く
+      triggerMoshimo();
     }
 
-    const script = document.createElement('script');
-    script.id = scriptId;
-    script.src = "//dn.msmstatic.com/site/cardlink/bundle.js?20220329";
-    script.async = true;
-    
-    // スクリプトが読み込まれたら即座に実行する命令
-    script.onload = () => {
-      if (typeof (window as any).msmaflink === 'function') {
-        (window as any).msmaflink();
-      }
-    };
-
-    document.body.appendChild(script);
-
-    // 画面遷移後、メモリ上に残っている関数を直接叩く（予備）
-    const timer = setTimeout(() => {
-      if (typeof (window as any).msmaflink === 'function') {
-        (window as any).msmaflink();
-      }
-    }, 100);
+    // ── SPA遷移対策の決定打 ──
+    // Next.jsのレンダリング直後はDOMがまだ準備できていない場合があるため、
+    // タイマーを重ねて実行し、確実に関数を呼び出す
+    const timers = [
+      setTimeout(triggerMoshimo, 50),
+      setTimeout(triggerMoshimo, 200),
+      setTimeout(triggerMoshimo, 500),
+    ];
 
     return () => {
-      clearTimeout(timer);
+      timers.forEach(t => clearTimeout(t));
     };
-  }, [html]); // HTMLの中身（商品）が変わるたびに実行
+  }, [html]); // html（商品データ）が切り替わるたびに再実行
 
   return (
     <div 
       className="moshimo-link-wrapper my-6 clear-both" 
-      // ★ 枠線（border）や影（shadow）を削除し、もしも側のデザインに任せる
+      // 既存のコンテンツ（「リンク」という文字など）を一度空にするため、keyをhtmlに設定
+      key={html.substring(0, 50)} 
       dangerouslySetInnerHTML={{ __html: html }} 
     />
   );

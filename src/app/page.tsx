@@ -224,6 +224,26 @@ export default function ExplorePage() {
         </div>
       </div>
 
+{/* ── ★ 追加した一括表示ボタン ── */}
+            <div className="flex gap-4">
+              <button 
+                onClick={() => handleViewAll('indoor')}
+                className="text-xs text-ink-light hover:text-ink underline underline-offset-4 decoration-border-light transition-colors"
+              >
+                インドアの趣味を全部みる
+              </button>
+              <button 
+                onClick={() => handleViewAll('outdoor')}
+                className="text-xs text-ink-light hover:text-ink underline underline-offset-4 decoration-border-light transition-colors"
+              >
+                アウトドアの趣味を全部みる
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
       {/* 検索結果 */}
       {hasSearched && (
         <div id="results-area" className="w-full mt-16 animate-in slide-in-from-bottom-8 fade-in duration-1000 scroll-mt-10">

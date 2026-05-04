@@ -196,6 +196,8 @@ export default function ExplorePage() {
 
           </div>
         </div>
+
+      </div>
             {/* ── ★ 追加した一括表示ボタン ── */}
             <div className="flex gap-4">
               <button 
@@ -211,7 +213,6 @@ export default function ExplorePage() {
                 アウトドアの趣味を全部みる
               </button>
             </div>
-      </div>
 
       {hasSearched && (
         <div id="results-area" className="w-full mt-16 animate-in slide-in-from-bottom-8 fade-in duration-1000 scroll-mt-10">

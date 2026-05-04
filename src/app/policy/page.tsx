@@ -34,12 +34,12 @@ export default function PolicyPage() {
             </h2>
             <div className="space-y-4">
               <p>
-                当サイト「HobbyFlow」は、もしもアフィリエイト、およびAmazonアソシエイト・プログラム等のアフィリエイト宣伝プログラムを利用しています。
+                当サイト「HobbyFlow」は、もしもアフィリエイト等のアフィリエイト宣伝プログラムを利用しています。また、Amazonアソシエイト・プログラムを利用することを予定しています。
               </p>
               <div className="bg-cream/50 p-4 rounded-2xl border border-border-light">
                 <p className="font-bold text-ink mb-2">【Amazonアソシエイトに関する表示】</p>
                 <p>
-                  HobbyFlowは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムの参加者です。
+                  HobbyFlowは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムの参加者となることを予定しています。
                 </p>
                 <p className="mt-2 text-ink">
                   第三者（Amazonや他の広告掲載者）がコンテンツおよび宣伝を提供し、訪問者から直接情報を収集し、訪問者のブラウザにクッキー（Cookie）を設定したり、これを認識したりする場合があります。

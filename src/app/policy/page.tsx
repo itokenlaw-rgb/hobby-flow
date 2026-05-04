@@ -34,19 +34,18 @@ export default function PolicyPage() {
             </h2>
             <div className="space-y-4">
               <p>
-                当サイト「HobbyFlow」は、もしもアフィリエイト等のアフィリエイト宣伝プログラムを利用しています。また、Amazonアソシエイト・プログラムを利用することを予定しています。
+                当サイト「HobbyFlow」は、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムの参加者です。
               </p>
               <div className="bg-cream/50 p-4 rounded-2xl border border-border-light">
-                <p className="font-bold text-ink mb-2">【Amazonアソシエイトに関する表示】</p>
-                <p>
-                  HobbyFlowは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムの参加者となることを予定しています。
+                <p className="text-ink font-bold">
+                  Amazonのアソシエイトとして、HobbyFlowの運営者は適格販売により収入を得ています。
                 </p>
                 <p className="mt-2 text-ink">
                   第三者（Amazonや他の広告掲載者）がコンテンツおよび宣伝を提供し、訪問者から直接情報を収集し、訪問者のブラウザにクッキー（Cookie）を設定したり、これを認識したりする場合があります。
                 </p>
               </div>
               <p>
-                また、当サイトは「もしもアフィリエイト」を通じて、楽天市場、Yahoo!ショッピング等の商品を紹介しております。これらの広告プログラムにより、当サイトの運営者は適格販売により収入を得ています。
+                また、当サイトは「もしもアフィリエイト」を通じて、楽天市場、Yahoo!ショッピング等の商品を紹介しております。これらの広告プログラムにより、当サイトの運営者は紹介料を得る場合があります。
               </p>
             </div>
           </section>
@@ -88,36 +87,35 @@ export default function PolicyPage() {
             </p>
           </section>
 
-{/* ─── 5. お問い合わせ ─── */}
-<section>
-  <h2 className="text-base font-bold text-ink mb-4 pb-2 border-b border-border-light flex items-center gap-2">
-    <Mail className="w-5 h-5 text-accent" />
-    お問い合わせ
-  </h2>
-  <div className="space-y-4">
-    <p>
-      当サイト「HobbyFlow」に関するご意見・ご質問、または著作権等に関するお問い合わせは、以下の「お問い合わせフォーム」よりご連絡ください。
-    </p>
-    <div className="pt-2">
-      <a 
-        href="https://forms.gle/LuhHqKe4ibvTFzKM9" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-6 py-3 bg-ink text-white rounded-full font-bold text-sm hover:bg-ink/80 transition-all shadow-sm"
-      >
-        <Mail className="w-4 h-4" />
-        お問い合わせフォームを開く
-      </a>
-    </div>
-  </div>
-</section>
-
+          {/* ─── 5. お問い合わせ ─── */}
+          <section>
+            <h2 className="text-base font-bold text-ink mb-4 pb-2 border-b border-border-light flex items-center gap-2">
+              <Mail className="w-5 h-5 text-accent" />
+              お問い合わせ
+            </h2>
+            <div className="space-y-4">
+              <p>
+                当サイト「HobbyFlow」に関するご意見・ご質問、または著作権等に関するお問い合わせは、以下の「お問い合わせフォーム」よりご連絡ください。
+              </p>
+              <div className="pt-2">
+                <a 
+                  href="https://forms.gle/LuhHqKe4ibvTFzKM9" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-ink text-white rounded-full font-bold text-sm hover:bg-ink/80 transition-all shadow-sm"
+                >
+                  <Mail className="w-4 h-4" />
+                  お問い合わせフォームを開く
+                </a>
+              </div>
+            </div>
+          </section>
 
         </div>
       </div>
 
       <div className="mt-8 text-center">
-        <p className="text-xs text-ink-light">策定日：2024年5月2日</p>
+        <p className="text-xs text-ink-light">策定日：2026年5月4日</p>
       </div>
     </div>
   );

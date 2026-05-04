@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Serif_JP } from "next/font/google";
 import "./globals.css";
 import Link from 'next/link';
-import { Compass, Book, UserCircle, Calendar } from 'lucide-react';
+import { Compass, Calendar } from 'lucide-react';
 
 const notoSerif = Noto_Serif_JP({
   variable: "--font-noto-serif-jp",
@@ -10,9 +10,13 @@ const notoSerif = Noto_Serif_JP({
   weight: ["400", "700"],
 });
 
+// ── Google Search Console の認証用設定を追加 ──
 export const metadata: Metadata = {
   title: "HobbyFlow",
   description: "自分のための趣味記録帳",
+  verification: {
+    google: "XPHzI5cboVyF-X8HhQL31TQVSFKaUipBhL4lts6_Nqc",
+  },
 };
 
 export default function RootLayout({
@@ -36,10 +40,10 @@ export default function RootLayout({
                 <span>探す</span>
               </Link>
 
-<Link href="/records" className="flex flex-col items-center gap-1 hover:text-ink transition-colors">
-  <Calendar className="w-5 h-5" />
-  <span>記録</span>
-</Link>
+              <Link href="/records" className="flex flex-col items-center gap-1 hover:text-ink transition-colors">
+                <Calendar className="w-5 h-5" />
+                <span>記録</span>
+              </Link>
             </nav>
           </header>
           

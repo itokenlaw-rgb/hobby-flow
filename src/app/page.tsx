@@ -214,6 +214,93 @@ export default function ExplorePage() {
             </div>
           </div>
 
+
+
+// 1. まず、表示したいブログ記事のデータを定義します（hobbiesDataの下あたり）
+const blogPosts = [
+  {
+    id: "jisha-meguri", // hobbies.jsonのIDと紐付ける（画像取得用）
+    hobbyId: "new-09-jisha-meguri", 
+    title: "坂道のある街で、深呼吸。寺社巡りリトリート",
+    date: "2026.05.03",
+    excerpt: "デジタル漬けの毎日から一旦ログアウト。新しい靴で歩き出した先で見つけた景色とは..."
+  },
+  {
+    id: "souji",
+    hobbyId: "fb52c59d-2063-4c93-99e8-7eb79983c639",
+    title: "クローゼットの「挫折」と向き合う。掃除で見つけた心の再起動",
+    date: "2026.05.04",
+    excerpt: "雨の日の虚無感を打破。引き出し一つから始める、私なりのスモールステップ。"
+  },
+  {
+    id: "ryouri",
+    hobbyId: "3df947d7-a086-4101-8aee-37c898422309",
+    title: "誰のためでもない、自分のための「おいしい」を作る。自炊の魔法",
+    date: "2026.05.05",
+    excerpt: "コンビニ弁当を卒業して、自分を大切にする「お土産」を作る時間。"
+  },
+  // 今後、ここに新しいオブジェクトを追加していくだけでカードが増えます！
+];
+
+// --- 中略 (ExplorePage コンポーネントの return 内) ---
+
+<div className="flex gap-3 mt-2">
+  {/* ここが既存のボタンエリア */}
+</div>
+
+{/* ★ ハルのHobbyFlow日記セクション ★ */}
+<div className="w-full max-w-5xl mt-24 mb-16 px-6">
+  <div className="flex flex-col items-center mb-12">
+    <div className="flex items-center gap-2 mb-2">
+      <Sparkles className="w-5 h-5 text-accent" />
+      <h3 className="text-2xl font-serif font-bold text-ink">ハルのHobbyFlow日記</h3>
+    </div>
+    <p className="text-sm text-ink-light italic">アンバサダー「ハル」が、実際に趣味を体験してみた記録です</p>
+  </div>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+    {blogPosts.map((post) => (
+      <Link href={`/hobbies/${post.hobbyId}`} key={post.id} className="group">
+        <div className="bg-white rounded-2xl overflow-hidden border border-border-light shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col sm:flex-row h-full">
+          {/* 左：サムネイル画像 */}
+          <div className="w-full sm:w-44 h-40 relative flex-shrink-0">
+            <img 
+              src={getHobbyImageUrl(post.hobbyId) || '/default-hobby.jpg'} 
+              alt="" 
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+            />
+            <div className="absolute inset-0 bg-ink/5 group-hover:bg-transparent transition-colors" />
+          </div>
+
+          {/* 右：文章コンテンツ */}
+          <div className="p-5 flex flex-col flex-1">
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-[10px] font-bold text-accent uppercase tracking-tighter">{post.date}</span>
+            </div>
+            <h4 className="text-base font-bold text-ink leading-tight mb-2 group-hover:text-accent transition-colors">
+              {post.title}
+            </h4>
+            <p className="text-xs text-ink-light line-clamp-2 italic mb-4">
+              {post.excerpt}
+            </p>
+            <div className="mt-auto text-[10px] font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
+              READ DIARY <ChevronRight className="w-3 h-3" />
+            </div>
+          </div>
+        </div>
+      </Link>
+    ))}
+  </div>
+
+  <div className="mt-12 text-center">
+    <p className="text-xs text-ink-light opacity-60">
+      「1ヶ月後の私が、今の私を見て『懐かしい！』って笑ってくれますように。」
+    </p>
+  </div>
+</div>
+
+
+
       {hasSearched && (
         <div id="results-area" className="w-full mt-16 animate-in slide-in-from-bottom-8 fade-in duration-1000 scroll-mt-10">
           <div className="text-center mb-10">

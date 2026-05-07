@@ -4,8 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Users, Search, Coffee, Map, Palette, Sparkles, Calendar, ArrowRight } from 'lucide-react';
 import hobbiesData from '@/data/hobbies.json';
-
-// --- ヘルパー関数 ---
+import { blogPosts } from '@/data/blogPosts';
 const shuffleArray = (array: any[]) => {
   const newArr = [...array];
   for (let i = newArr.length - 1; i > 0; i--) {
@@ -30,24 +29,6 @@ const getHobbyImageUrl = (hobbyId: string): string | null => {
   const num = String(index + 1).padStart(3, '0');
   return `/hobby_image_${num}.jpg`;
 };
-
-// --- ブログ記事データ ---
-const blogPosts = [
-  {
-    id: "blog-jisha",
-    hobbyId: "new-09-jisha-meguri",
-    title: "坂道のある街で、深呼吸。寺社巡りリトリート",
-    date: "2026.05.03",
-    excerpt: "デジタル漬けの毎日から一旦ログアウト。新しい靴で歩き出した先で見つけた景色とは..."
-  },
-  {
-    id: "blog-kunsei",
-    hobbyId: "new-01-kunsei",
-    title: "煙を愛でる、大人の週末。自家製燻製のすすめ",
-    date: "2026.05.01",
-    excerpt: "チーズやナッツが琥珀色に色づくのを待つ時間。それ自体が最高の酒の肴になる、贅沢な趣味の話。"
-  }
-];
 
 export default function ExplorePage() {
   const [hasSearched, setHasSearched] = useState(false);
@@ -193,21 +174,40 @@ export default function ExplorePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
             {blogPosts.map((post) => {
-              const imageUrl = getHobbyImageUrl(post.hobbyId);
+              const imageUrl = post.imageOverride || getHobbyImageUrl(post.hobbyId);
               return (
-                /* ★ 修正ポイント: リンク先を /blog/${post.id} にしました */
-                <Link href={`/blog/${post.id}`} key={post.id} className="group flex flex-col bg-white rounded-3xl shadow-sm border border-border-light overflow-hidden hover:shadow-md transition-all">
-                  {imageUrl && (
-                    <div className="h-48 overflow-hidden">
-                      <img src={imageUrl} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Link href={`/blog/${post.id}`} key={post.id} className="group flex flex-col bg-white rounded-3xl shadow-sm border border-border-light overflow-hidden hover:shadow-lg transition-all duration-300">
+                  {/* カード上部：画像＋タイトルオーバーレイ */}
+                  <div className="relative h-52 overflow-hidden flex-shrink-0">
+                    {imageUrl && (
+                      <img
+                        src={imageUrl}
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                    )}
+                    {/* グラデーションオーバーレイ */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                    {/* 日付バッジ */}
+                    <div className="absolute top-4 left-4">
+                      <span className="text-[10px] font-bold text-white/70 tracking-widest uppercase bg-black/30 backdrop-blur-sm px-2 py-1 rounded-full">
+                        {post.date}
+                      </span>
                     </div>
-                  )}
-                  <div className="p-6 space-y-3">
-                    <span className="text-[10px] font-bold text-accent tracking-widest uppercase">{post.date}</span>
-                    <h4 className="text-lg font-bold text-ink leading-snug group-hover:text-accent transition-colors">{post.title}</h4>
-                    <p className="text-sm text-ink-light line-clamp-2">{post.excerpt}</p>
-                    <div className="pt-2 flex items-center text-xs font-bold text-ink group-hover:gap-2 transition-all">
-                      この記事を読む <ArrowRight className="w-3 h-3 ml-1" />
+                    {/* タイトル（画像上に重ねて表示） */}
+                    <div className="absolute bottom-0 left-0 right-0 p-5">
+                      <h4 className="text-base font-bold text-white leading-snug drop-shadow-md group-hover:text-accent/90 transition-colors">
+                        {post.title}
+                      </h4>
+                    </div>
+                  </div>
+
+                  {/* カード下部：抜粋＋リンク */}
+                  <div className="p-5 flex flex-col gap-3 flex-1">
+                    <p className="text-sm text-ink-light line-clamp-2 leading-relaxed">{post.excerpt}</p>
+                    <div className="mt-auto pt-3 border-t border-border-light/50 flex items-center gap-1 text-xs font-bold text-ink-light group-hover:text-accent transition-colors">
+                      この記事を読む
+                      <ArrowRight className="w-3.5 h-3.5 ml-0.5 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
                 </Link>

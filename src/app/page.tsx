@@ -34,14 +34,14 @@ const getHobbyImageUrl = (hobbyId: string): string | null => {
 // --- ブログ記事データ ---
 const blogPosts = [
   {
-    id: "jisha-meguri",
+    id: "blog-jisha",
     hobbyId: "new-09-jisha-meguri",
     title: "坂道のある街で、深呼吸。寺社巡りリトリート",
     date: "2026.05.03",
-    excerpt: "忙しい日常から少しだけ離れて、歴史あるお寺の門をくぐる。漂うお香の香りと、静寂が教えてくれる大切なこと。"
+    excerpt: "デジタル漬けの毎日から一旦ログアウト。新しい靴で歩き出した先で見つけた景色とは..."
   },
   {
-    id: "kunsei",
+    id: "blog-kunsei",
     hobbyId: "new-01-kunsei",
     title: "煙を愛でる、大人の週末。自家製燻製のすすめ",
     date: "2026.05.01",
@@ -139,7 +139,7 @@ export default function ExplorePage() {
                 <Link href={`/hobbies/${hobby.id}`} key={hobby.id} className="block group">
                   <div className="relative p-6 bg-white rounded-2xl shadow-sm border border-border-light transition-all hover:shadow-md hover:-translate-y-2 flex flex-col h-64 overflow-hidden">
                     
-                    {/* ★ 背景画像：以前のスタイルを復元 */}
+                    {/* 背景画像：お洒落な薄い画像 */}
                     {imageUrl && (
                       <div className="absolute inset-0 z-0 overflow-hidden">
                         <img 
@@ -159,7 +159,6 @@ export default function ExplorePage() {
                         <h4 className="text-lg font-bold text-ink group-hover:text-accent transition-colors">{hobby.name}</h4>
                       </div>
 
-                      {/* 説明文を追加 */}
                       <p className="text-sm text-ink-light leading-relaxed line-clamp-3 mb-4 italic">
                         {hobby.pitch?.replace(/<<|>>/g, '')}
                       </p>
@@ -185,7 +184,7 @@ export default function ExplorePage() {
         </div>
       )}
 
-      {/* ブログ記事セクション */}
+      {/* ブログ記事セクション（HobbyLog） */}
       {!hasSearched && (
         <div className="w-full max-w-4xl mt-24 px-4 pb-20">
           <div className="flex items-center gap-3 mb-8">
@@ -196,7 +195,8 @@ export default function ExplorePage() {
             {blogPosts.map((post) => {
               const imageUrl = getHobbyImageUrl(post.hobbyId);
               return (
-                <Link href={`/hobbies/${post.hobbyId}`} key={post.id} className="group flex flex-col bg-white rounded-3xl shadow-sm border border-border-light overflow-hidden hover:shadow-md transition-all">
+                /* ★ 修正ポイント: リンク先を /blog/${post.id} にしました */
+                <Link href={`/blog/${post.id}`} key={post.id} className="group flex flex-col bg-white rounded-3xl shadow-sm border border-border-light overflow-hidden hover:shadow-md transition-all">
                   {imageUrl && (
                     <div className="h-48 overflow-hidden">
                       <img src={imageUrl} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />

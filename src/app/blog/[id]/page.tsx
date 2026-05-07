@@ -1,12 +1,21 @@
-import { blogPosts } from '@/data/blogPosts'; // データの場所に合わせて調整してください
+import { blogPosts } from '@/data/blogPosts'; // パスが正しいか確認してください
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, User } from 'lucide-react';
+import hobbiesData from '@/data/hobbies.json';
 
 export default function BlogDetailPage({ params }: { params: { id: string } }) {
   const post = blogPosts.find((p) => p.id === params.id);
 
   if (!post) notFound();
+
+  // 趣味の画像を流用するためのロジック
+  const getHobbyImageUrl = (hobbyId: string): string | null => {
+    const index = (hobbiesData as any[]).findIndex((h) => h.id === hobbyId);
+    if (index < 0) return `/hobby_image_001.jpg`; // 見つからない時のフォールバック
+    const num = String(index + 1).padStart(3, '0');
+    return `/hobby_image_${num}.jpg`;
+  };
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 animate-in fade-in duration-700">
@@ -15,15 +24,14 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
       </Link>
 
       <article className="bg-white rounded-3xl shadow-sm border border-border-light overflow-hidden">
-        {/* ヘッダー画像（趣味画像を流用） */}
         <div className="h-64 bg-ink relative">
           <img 
-            src={`/hobby_image_${String(20).padStart(3, '0')}.jpg`} // 仮の画像ロジック
+            src={getHobbyImageUrl(post.hobbyId)}
             alt={post.title}
             className="w-full h-full object-cover opacity-60"
           />
-          <div className="absolute bottom-8 left-8 right-8">
-            <h1 className="text-3xl font-bold text-white leading-tight">{post.title}</h1>
+          <div className="absolute bottom-8 left-8 right-8 text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight">{post.title}</h1>
           </div>
         </div>
 
@@ -33,7 +41,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
             <div className="flex items-center gap-2"><User className="w-4 h-4" /> ハル</div>
           </div>
 
-          <div className="space-y-12">
+          <div className="space-y-12 text-left">
             {post.content.map((section, i) => (
               <section key={i} className="space-y-4">
                 <h2 className="text-xl font-bold text-ink flex items-center gap-2">

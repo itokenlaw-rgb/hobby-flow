@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Users, Search, Coffee, Map, Palette, Sparkles, Calendar, ArrowRight } from 'lucide-react';
 import hobbiesData from '@/data/hobbies.json';
-import { blogPosts } from '@/data/blogPosts'; // 忘れずにインポート
 
 // --- ヘルパー関数 ---
 const shuffleArray = (array: any[]) => {
@@ -32,21 +31,54 @@ const getHobbyImageUrl = (hobbyId: string): string | null => {
   return `/hobby_image_${num}.jpg`;
 };
 
+// --- ブログ記事データ ---
+const blogPosts = [
+  {
+    id: "blog-jisha",
+    hobbyId: "new-09-jisha-meguri",
+    title: "坂道のある街で、深呼吸。寺社巡りリトリート",
+    date: "2026.05.03",
+    excerpt: "デジタル漬けの毎日から一旦ログアウト。新しい靴で歩き出した先で見つけた景色とは..."
+  },
+  {
+    id: "blog-kunsei",
+    hobbyId: "new-01-kunsei",
+    title: "煙を愛でる、大人の週末。自家製燻製のすすめ",
+    date: "2026.05.01",
+    excerpt: "チーズやナッツが琥珀色に色づくのを待つ時間。それ自体が最高の酒の肴になる、贅沢な趣味の話。"
+  }
+];
+
 export default function ExplorePage() {
   const [hasSearched, setHasSearched] = useState(false);
   const [location, setLocation] = useState<'indoor' | 'outdoor' | null>(null);
+  const [cost, setCost] = useState<'low' | 'high' | null>(null);
+  const [time, setTime] = useState<'short' | 'long' | null>(null);
   const [results, setResults] = useState<any[]>([]);
+
+  const handleViewAll = (type: 'indoor' | 'outdoor') => {
+    const tagName = type === 'indoor' ? 'インドア' : 'アウトドア';
+    const filtered = hobbiesData.filter(h => h.tags?.includes(tagName));
+    setLocation(type);
+    setCost(null);
+    setTime(null);
+    setResults(shuffleArray(filtered));
+    setHasSearched(true);
+    setTimeout(() => document.getElementById('results-area')?.scrollIntoView({ behavior: 'smooth' }), 100);
+  };
 
   const handleSearch = () => {
     const TARGET = 8;
+    const all = hobbiesData as any[];
     const matchesLocation = (h: any) => {
       if (location === 'indoor' && !h.tags.includes('インドア')) return false;
       if (location === 'outdoor' && !h.tags.includes('アウトドア')) return false;
       return true;
     };
-    const scored = shuffleArray(hobbiesData as any[]).filter(matchesLocation);
-    setResults(scored.slice(0, TARGET));
+    const scored = shuffleArray(all).filter(matchesLocation).map(h => ({ hobby: h, score: 1 }));
+    setResults(scored.map(s => s.hobby).slice(0, TARGET));
     setHasSearched(true);
+    setTimeout(() => document.getElementById('results-area')?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
   return (
@@ -55,29 +87,104 @@ export default function ExplorePage() {
       {/* ヒーローセクション */}
       <div className={`w-full max-w-2xl transition-all duration-700 flex flex-col items-center ${hasSearched ? '-translate-y-8 opacity-90' : 'translate-y-12'}`}>
         <h2 className="text-3xl sm:text-4xl font-serif font-bold text-ink mb-12 tracking-widest text-center">今日はなにする？</h2>
+
         <div className="w-full space-y-8 bg-white p-8 rounded-3xl shadow-sm border border-border-light relative z-10">
-          <div className="flex justify-center gap-4">
-            <button onClick={() => setLocation('indoor')} className={`px-6 py-2 rounded-full border ${location === 'indoor' ? 'bg-ink text-white' : 'text-ink-light'}`}>インドア</button>
-            <button onClick={() => setLocation('outdoor')} className={`px-6 py-2 rounded-full border ${location === 'outdoor' ? 'bg-ink text-white' : 'text-ink-light'}`}>アウトドア</button>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="flex flex-col gap-3 text-center">
+              <label className="text-xs text-ink-light font-bold">場所</label>
+              <div className="flex rounded-full border border-border-light overflow-hidden">
+                <button onClick={() => setLocation(location === 'indoor' ? null : 'indoor')} className={`flex-1 py-2 text-sm ${location === 'indoor' ? 'bg-ink text-white' : 'text-ink-light'}`}>インドア</button>
+                <button onClick={() => setLocation(location === 'outdoor' ? null : 'outdoor')} className={`flex-1 py-2 text-sm ${location === 'outdoor' ? 'bg-ink text-white' : 'text-ink-light'}`}>アウトドア</button>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 text-center">
+              <label className="text-xs text-ink-light font-bold">費用</label>
+              <div className="flex rounded-full border border-border-light overflow-hidden">
+                <button onClick={() => setCost(cost === 'low' ? null : 'low')} className={`flex-1 py-2 text-sm ${cost === 'low' ? 'bg-ink text-white' : 'text-ink-light'}`}>お手軽</button>
+                <button onClick={() => setCost(cost === 'high' ? null : 'high')} className={`flex-1 py-2 text-sm ${cost === 'high' ? 'bg-ink text-white' : 'text-ink-light'}`}>豪華</button>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 text-center">
+              <label className="text-xs text-ink-light font-bold">時間</label>
+              <div className="flex rounded-full border border-border-light overflow-hidden">
+                <button onClick={() => setTime(time === 'short' ? null : 'short')} className={`flex-1 py-2 text-sm ${time === 'short' ? 'bg-ink text-white' : 'text-ink-light'}`}>サクッと</button>
+                <button onClick={() => setTime(time === 'long' ? null : 'long')} className={`flex-1 py-2 text-sm ${time === 'long' ? 'bg-ink text-white' : 'text-ink-light'}`}>じっくり</button>
+              </div>
+            </div>
           </div>
-          <button onClick={handleSearch} className="w-full py-4 bg-ink text-cream rounded-full font-bold flex justify-center items-center gap-2">
-            <Search className="w-5 h-5 text-accent" /> 趣味を探す！
-          </button>
+
+          <div className="pt-4 flex flex-col items-center gap-6">
+            <button onClick={handleSearch} className="px-10 py-4 bg-ink text-cream rounded-full font-bold shadow-md hover:scale-105 transition-all flex items-center gap-2 group text-lg">
+              <Search className="w-5 h-5 text-accent" />趣味を探す！
+            </button>
+            <div className="flex gap-3 mt-2">
+              <button onClick={() => handleViewAll('indoor')} className="px-4 py-1.5 text-[11px] text-ink-light hover:text-ink hover:bg-cream border border-border-light rounded-full transition-all">インドアを全部みる</button>
+              <button onClick={() => handleViewAll('outdoor')} className="px-4 py-1.5 text-[11px] text-ink-light hover:text-ink hover:bg-cream border border-border-light rounded-full transition-all">アウトドアを全部みる</button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 検索結果 */}
+      {/* 検索結果エリア */}
       {hasSearched && (
-        <div className="w-full mt-16 grid sm:grid-cols-2 gap-6 px-4 max-w-5xl">
-          {results.map((hobby: any) => (
-            <Link href={`/hobbies/${hobby.id}`} key={hobby.id} className="block p-6 bg-white rounded-2xl border border-border-light">
-              <h4 className="font-bold text-ink">{hobby.name}</h4>
-            </Link>
-          ))}
+        <div id="results-area" className="w-full mt-16 animate-in slide-in-from-bottom-8 fade-in duration-1000 scroll-mt-10">
+          <div className="text-center mb-10">
+            <h3 className="text-xl font-bold text-ink font-serif">あなたにぴったりの過ごし方</h3>
+            <p className="text-sm text-ink-light mt-2">{results.length}個のアイデアが見つかりました</p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-6 w-full pb-16 px-4 max-w-5xl mx-auto">
+            {results.map((hobby: any) => {
+              const imageUrl = getHobbyImageUrl(hobby.id);
+              return (
+                <Link href={`/hobbies/${hobby.id}`} key={hobby.id} className="block group">
+                  <div className="relative p-6 bg-white rounded-2xl shadow-sm border border-border-light transition-all hover:shadow-md hover:-translate-y-2 flex flex-col h-64 overflow-hidden">
+                    
+                    {/* 背景画像：お洒落な薄い画像 */}
+                    {imageUrl && (
+                      <div className="absolute inset-0 z-0 overflow-hidden">
+                        <img 
+                          src={imageUrl} 
+                          alt="" 
+                          className="w-full h-full object-cover opacity-[0.12] group-hover:scale-110 transition-transform duration-700 group-hover:opacity-20"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent" />
+                      </div>
+                    )}
+
+                    <div className="relative z-10 flex flex-col h-full">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-cream flex items-center justify-center text-accent border border-border-light shadow-inner">
+                          {getHobbyIcon(hobby.tags || [])}
+                        </div>
+                        <h4 className="text-lg font-bold text-ink group-hover:text-accent transition-colors">{hobby.name}</h4>
+                      </div>
+
+                      <p className="text-sm text-ink-light leading-relaxed line-clamp-3 mb-4 italic">
+                        {hobby.pitch?.replace(/<<|>>/g, '')}
+                      </p>
+
+                      <div className="flex items-center gap-2 mb-4 text-[10px]">
+                        {hobby.tags?.map((t: string) => (
+                          <span key={t} className="px-2 py-0.5 bg-white/60 backdrop-blur-sm rounded border border-border-light text-ink-light">{t}</span>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-border-light/50 border-dashed">
+                        <div className="flex items-center gap-1.5 text-[10px] text-ink-light/80 font-medium">
+                          <Users className="w-3 h-3" />
+                          <span>約 {(hobby.global_active_users || 12000).toLocaleString()}人が参加中</span>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-accent transform translate-x-0 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       )}
 
-      {/* ブログセクション */}
+      {/* ブログ記事セクション（HobbyLog） */}
       {!hasSearched && (
         <div className="w-full max-w-4xl mt-24 px-4 pb-20">
           <div className="flex items-center gap-3 mb-8">
@@ -88,14 +195,14 @@ export default function ExplorePage() {
             {blogPosts.map((post) => {
               const imageUrl = getHobbyImageUrl(post.hobbyId);
               return (
-                /* ★ ここが /blog/${post.id} になっていることが重要です */
+                /* ★ 修正ポイント: リンク先を /blog/${post.id} にしました */
                 <Link href={`/blog/${post.id}`} key={post.id} className="group flex flex-col bg-white rounded-3xl shadow-sm border border-border-light overflow-hidden hover:shadow-md transition-all">
                   {imageUrl && (
                     <div className="h-48 overflow-hidden">
                       <img src={imageUrl} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
                   )}
-                  <div className="p-6 space-y-3 text-left">
+                  <div className="p-6 space-y-3">
                     <span className="text-[10px] font-bold text-accent tracking-widest uppercase">{post.date}</span>
                     <h4 className="text-lg font-bold text-ink leading-snug group-hover:text-accent transition-colors">{post.title}</h4>
                     <p className="text-sm text-ink-light line-clamp-2">{post.excerpt}</p>

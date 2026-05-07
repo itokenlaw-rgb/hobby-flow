@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Users, Search, Sparkles, Coffee, Map, Palette, X, ChevronRight, ArrowRight } from 'lucide-react';
+import { Users, Search, Sparkles, Coffee, Map, Palette } from 'lucide-react';
 import hobbiesData from '@/data/hobbies.json';
-import { blogPosts, BlogPost } from '@/data/blogPosts';
 
 const shuffleArray = (array: any[]) => {
   const newArr = [...array];
@@ -33,255 +32,320 @@ const getHobbyImageUrl = (hobbyId: string): string | null => {
 
 function ComingSoonModal({ onClose }: { onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-ink/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-in fade-in zoom-in duration-300">
-        <div className="w-16 h-16 bg-cream rounded-full flex items-center justify-center mx-auto mb-6">
-          <Sparkles className="w-8 h-8 text-accent" />
-        </div>
-        <h3 className="text-xl font-bold text-ink mb-2">Coming Soon...</h3>
-        <p className="text-sm text-ink-light mb-8 leading-relaxed">
-          診断機能は現在ハルが一生懸命準備中です！<br />公開までもう少々お待ちください。
-        </p>
-        <button
-          onClick={onClose}
-          className="w-full py-4 bg-ink text-white rounded-full font-bold hover:bg-accent transition-colors"
-        >
-          わかった！
-        </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={onClose}>
+      <div className="bg-white rounded-3xl shadow-2xl px-8 py-10 sm:px-12 sm:py-12 flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-300 max-w-sm w-full text-center" onClick={(e) => e.stopPropagation()}>
+        <span className="text-4xl mb-2">🚧</span>
+        <p className="text-2xl font-bold text-ink tracking-wide">Coming Soon...</p>
+        <p className="text-sm text-ink-light">この機能は現在準備中です。<br />公開を楽しみにお待ちください！</p>
+        <button onClick={onClose} className="mt-4 px-8 py-2.5 rounded-full bg-ink text-white text-sm font-bold hover:opacity-80 transition-opacity">閉じる</button>
       </div>
     </div>
   );
 }
 
 export default function ExplorePage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'indoor' | 'outdoor'>('all');
+  const [hasSearched, setHasSearched] = useState(false);
+  const [location, setLocation] = useState<'indoor' | 'outdoor' | null>(null);
+  const [cost, setCost] = useState<'low' | 'high' | null>(null);
+  const [time, setTime] = useState<'short' | 'long' | null>(null);
+  const [results, setResults] = useState<any[]>([]);
   const [showComingSoon, setShowComingSoon] = useState(false);
-  const [selectedBlog, setSelectedBlog] = useState<BlogPost | null>(null);
 
-  const filteredHobbies = (hobbiesData as any[]).filter((hobby) => {
-    const matchesSearch = hobby.name.includes(searchQuery) || hobby.pitch.includes(searchQuery);
-    const matchesTab = 
-      activeTab === 'all' || 
-      (activeTab === 'indoor' && hobby.tags?.includes('インドア')) ||
-      (activeTab === 'outdoor' && hobby.tags?.includes('アウトドア'));
-    return matchesSearch && matchesTab;
-  });
+  // ── ★ 一括表示用のハンドラー ──
+  const handleViewAll = (type: 'indoor' | 'outdoor') => {
+    const tagName = type === 'indoor' ? 'インドア' : 'アウトドア';
+    const all = hobbiesData as any[];
+    
+    // フィルター：場所のみ一致させ、他は無視
+    const filtered = all.filter(h => h.tags?.includes(tagName));
+    
+    // ステートのリセットと設定
+    setLocation(type);
+    setCost(null);
+    setTime(null);
+    setResults(shuffleArray(filtered)); // 全件表示
+    setHasSearched(true);
 
-  const renderFirstLineWithBold = (text: string) => {
-    const firstSentence = text.split('。')[0] + '。';
-    const parts = firstSentence.split(/<<(.*?)>>/);
-    return parts.map((part, i) => i % 2 === 1 ? <strong key={i} className="text-accent not-italic">{part}</strong> : part);
+    // スクロール
+    setTimeout(() => {
+      const el = document.getElementById('results-area');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
-  // 画像取得の優先順位：独自画像 > 趣味のトップ画像
-  const getBlogImage = (post: BlogPost) => {
-    return post.imageOverride || getHobbyImageUrl(post.hobbyId) || '/default_blog.jpg';
+  const handleSearch = () => {
+    const TARGET = 8;
+    const all = hobbiesData as any[];
+
+    const matchesLocation = (hobby: any) => {
+      const tags = hobby.tags || [];
+      if (location === 'indoor'  && !tags.includes('インドア'))  return false;
+      if (location === 'outdoor' && !tags.includes('アウトドア')) return false;
+      return true;
+    };
+
+    const getTimeScore = (tags: string[]): number => {
+      if (time === 'short') {
+        if (tags.includes('時間小')) return 2;
+        if (tags.includes('時間中')) return 1;
+        return -1;
+      }
+      if (time === 'long') {
+        if (tags.includes('時間大')) return 2;
+        if (tags.includes('時間中')) return 1;
+        return -1;
+      }
+      return 1;
+    };
+
+    const getCostScore = (tags: string[]): number => {
+      if (cost === 'low') {
+        if (tags.includes('費用小')) return 2;
+        if (tags.includes('費用中')) return 1;
+        return -1;
+      }
+      if (cost === 'high') {
+        if (tags.includes('費用大')) return 2;
+        if (tags.includes('費用中')) return 1;
+        return -1;
+      }
+      return 1;
+    };
+
+    let scored = shuffleArray(all)
+      .filter(matchesLocation)
+      .map((hobby: any) => ({
+        hobby,
+        score: getTimeScore(hobby.tags || []) + getCostScore(hobby.tags || []),
+      }))
+      .filter(({ score }) => score >= 0);
+
+    scored.sort((a, b) => b.score - a.score);
+    let finalList = scored.map(({ hobby }) => hobby);
+
+    if (finalList.length < TARGET) {
+      const usedIds = new Set(finalList.map((h: any) => h.id));
+      const supplement = shuffleArray(
+        all.filter((h: any) => matchesLocation(h) && !usedIds.has(h.id))
+      );
+      finalList = [...finalList, ...supplement];
+    }
+
+    setResults(finalList.slice(0, TARGET));
+    setHasSearched(true);
+
+    setTimeout(() => {
+      const el = document.getElementById('results-area');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+
+  const renderFirstLineWithBold = (text: string) => {
+    if (!text) return '';
+    const sentence = text.split(/[。.]/)[0] + '。';
+    return sentence.split(/(<<.*?>>)/g).map((part, i) => {
+      if (part.startsWith('<<') && part.endsWith('>>')) {
+        return <strong key={i} className="font-bold text-ink">{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* ヒーローセクション */}
-      <div className="relative pt-32 pb-20 px-6 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-30 pointer-events-none">
-          <div className="absolute top-20 left-10 w-64 h-64 bg-accent/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-cream rounded-full blur-3xl animate-pulse delay-700" />
+    <div className="flex flex-col items-center justify-center min-h-[70vh] animate-in fade-in duration-700 transition-all">
+      {showComingSoon && <ComingSoonModal onClose={() => setShowComingSoon(false)} />}
+
+      <div className={`w-full max-w-2xl transition-all duration-700 ease-in-out flex flex-col items-center ${hasSearched ? '-translate-y-8 opacity-90' : 'translate-y-12'}`}>
+        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-ink mb-12 tracking-widest text-center">今日はなにする？</h2>
+
+        <div className="w-full space-y-8 bg-white p-8 rounded-3xl shadow-sm border border-border-light relative z-10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {/* 場所 */}
+            <div className="flex flex-col gap-3">
+              <label className="text-xs text-ink-light text-center font-bold">場所</label>
+              <div className="flex rounded-full border border-border-light overflow-hidden">
+                <button onClick={() => setLocation(location === 'indoor' ? null : 'indoor')} className={`flex-1 py-2.5 text-sm font-medium transition-all ${location === 'indoor' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}>インドア</button>
+                <div className="w-px bg-border-light" />
+                <button onClick={() => setLocation(location === 'outdoor' ? null : 'outdoor')} className={`flex-1 py-2.5 text-sm font-medium transition-all ${location === 'outdoor' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}>アウトドア</button>
+              </div>
+            </div>
+            {/* 費用 */}
+            <div className="flex flex-col gap-3">
+              <label className="text-xs text-ink-light text-center font-bold">費用</label>
+              <div className="flex rounded-full border border-border-light overflow-hidden">
+                <button onClick={() => setCost(cost === 'low' ? null : 'low')} className={`flex-1 py-2.5 text-sm font-medium transition-all ${cost === 'low' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}>お手軽</button>
+                <div className="w-px bg-border-light" />
+                <button onClick={() => setCost(cost === 'high' ? null : 'high')} className={`flex-1 py-2.5 text-sm font-medium transition-all ${cost === 'high' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}>ゴージャス</button>
+              </div>
+            </div>
+            {/* 時間 */}
+            <div className="flex flex-col gap-3">
+              <label className="text-xs text-ink-light text-center font-bold">時間</label>
+              <div className="flex rounded-full border border-border-light overflow-hidden">
+                <button onClick={() => setTime(time === 'short' ? null : 'short')} className={`flex-1 py-2.5 text-sm font-medium transition-all ${time === 'short' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}>サクッと</button>
+                <div className="w-px bg-border-light" />
+                <button onClick={() => setTime(time === 'long' ? null : 'long')} className={`flex-1 py-2.5 text-sm font-medium transition-all ${time === 'long' ? 'bg-ink text-white' : 'bg-white text-ink-light'}`}>じっくり</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-4 flex flex-col items-center gap-6">
+            <button onClick={handleSearch} className="px-10 py-4 bg-ink text-cream rounded-full font-bold shadow-md hover:scale-105 transition-all flex items-center gap-2 group text-lg">
+              <Search className="w-5 h-5 text-accent" />趣味を探す！
+            </button>
+
+          </div>
         </div>
 
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cream border border-border-light text-accent text-sm font-bold mb-8">
-            <Sparkles className="w-4 h-4" /> Discover Your Next Passion
-          </div>
-          <h1 className="text-4xl md:text-6xl font-serif font-bold text-ink mb-8 leading-tight">
-            次の休日、何して過ごす？
-          </h1>
-          
-          <div className="relative max-w-2xl mx-auto">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-ink-light w-5 h-5" />
-            <input
-              type="text"
-              placeholder="興味のあるキーワードを入力（例：癒やし、アクティブ、集中）"
-              className="w-full pl-14 pr-6 py-6 bg-white border-2 border-border-light rounded-full focus:border-accent outline-none text-lg shadow-lg shadow-ink/5 transition-all"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* タブ切り替えと診断ボタン */}
-      <div className="max-w-6xl mx-auto px-6 mb-16">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8 border-b border-border-light pb-8">
-          <div className="flex gap-4 p-1.5 bg-cream rounded-2xl">
-            {(['all', 'indoor', 'outdoor'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-8 py-3 rounded-xl font-bold transition-all ${
-                  activeTab === tab ? 'bg-white text-ink shadow-md' : 'text-ink-light hover:text-ink'
-                }`}
+{/* ── ★ 隙間をあけ、カプセル型の枠を追加した一括表示ボタン ── */}
+            <div className="flex gap-3 mt-2">
+              <button 
+                onClick={() => handleViewAll('indoor')} 
+                className="px-4 py-1.5 text-[11px] text-ink-light hover:text-ink hover:bg-cream border border-border-light rounded-full transition-all"
               >
-                {tab === 'all' ? 'すべて' : tab === 'indoor' ? 'インドア' : 'アウトドア'}
+                インドアの趣味を全部みる
               </button>
-            ))}
+              <button 
+                onClick={() => handleViewAll('outdoor')} 
+                className="px-4 py-1.5 text-[11px] text-ink-light hover:text-ink hover:bg-cream border border-border-light rounded-full transition-all"
+              >
+                アウトドアの趣味を全部みる
+              </button>
+            </div>
           </div>
 
-          <button 
-            onClick={() => setShowComingSoon(true)}
-            className="flex items-center gap-3 px-8 py-4 bg-ink text-white rounded-full font-bold hover:bg-accent transition-all shadow-xl hover:shadow-accent/20 group"
-          >
-            <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-            AIに趣味を診断してもらう
-          </button>
-        </div>
-      </div>
 
-      {/* 趣味一覧グリッド */}
-      <div className="max-w-6xl mx-auto px-6 pb-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredHobbies.map((hobby) => {
-            const imageUrl = getHobbyImageUrl(hobby.id);
-            return (
-              <Link key={hobby.id} href={`/hobbies/${hobby.id}`}>
-                <div className="group bg-white rounded-[2.5rem] overflow-hidden border border-border-light hover:border-accent/30 hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
-                  {imageUrl && (
-                    <div className="relative h-56 overflow-hidden">
-                      <img src={imageUrl} alt={hobby.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-ink/20 to-transparent" />
-                    </div>
-                  )}
-                  <div className="p-8 flex flex-col flex-1">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-cream flex items-center justify-center text-accent border border-border-light">
-                        {getHobbyIcon(hobby.tags || [])}
+
+// 1. まず、表示したいブログ記事のデータを定義します（hobbiesDataの下あたり）
+const blogPosts = [
+  {
+    id: "jisha-meguri", // hobbies.jsonのIDと紐付ける（画像取得用）
+    hobbyId: "new-09-jisha-meguri", 
+    title: "坂道のある街で、深呼吸。寺社巡りリトリート",
+    date: "2026.05.03",
+    excerpt: "デジタル漬けの毎日から一旦ログアウト。新しい靴で歩き出した先で見つけた景色とは..."
+  },
+  {
+    id: "souji",
+    hobbyId: "fb52c59d-2063-4c93-99e8-7eb79983c639",
+    title: "クローゼットの「挫折」と向き合う。掃除で見つけた心の再起動",
+    date: "2026.05.04",
+    excerpt: "雨の日の虚無感を打破。引き出し一つから始める、私なりのスモールステップ。"
+  },
+  {
+    id: "ryouri",
+    hobbyId: "3df947d7-a086-4101-8aee-37c898422309",
+    title: "誰のためでもない、自分のための「おいしい」を作る。自炊の魔法",
+    date: "2026.05.05",
+    excerpt: "コンビニ弁当を卒業して、自分を大切にする「お土産」を作る時間。"
+  },
+  // 今後、ここに新しいオブジェクトを追加していくだけでカードが増えます！
+];
+
+// --- 中略 (ExplorePage コンポーネントの return 内) ---
+
+<div className="flex gap-3 mt-2">
+  {/* ここが既存のボタンエリア */}
+</div>
+
+{/* ★ ハルのHobbyFlow日記セクション ★ */}
+<div className="w-full max-w-5xl mt-24 mb-16 px-6">
+  <div className="flex flex-col items-center mb-12">
+    <div className="flex items-center gap-2 mb-2">
+      <Sparkles className="w-5 h-5 text-accent" />
+      <h3 className="text-2xl font-serif font-bold text-ink">ハルのHobbyFlow日記</h3>
+    </div>
+    <p className="text-sm text-ink-light italic">アンバサダー「ハル」が、実際に趣味を体験してみた記録です</p>
+  </div>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+    {blogPosts.map((post) => (
+      <Link href={`/hobbies/${post.hobbyId}`} key={post.id} className="group">
+        <div className="bg-white rounded-2xl overflow-hidden border border-border-light shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col sm:flex-row h-full">
+          {/* 左：サムネイル画像 */}
+          <div className="w-full sm:w-44 h-40 relative flex-shrink-0">
+            <img 
+              src={getHobbyImageUrl(post.hobbyId) || '/default-hobby.jpg'} 
+              alt="" 
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+            />
+            <div className="absolute inset-0 bg-ink/5 group-hover:bg-transparent transition-colors" />
+          </div>
+
+          {/* 右：文章コンテンツ */}
+          <div className="p-5 flex flex-col flex-1">
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-[10px] font-bold text-accent uppercase tracking-tighter">{post.date}</span>
+            </div>
+            <h4 className="text-base font-bold text-ink leading-tight mb-2 group-hover:text-accent transition-colors">
+              {post.title}
+            </h4>
+            <p className="text-xs text-ink-light line-clamp-2 italic mb-4">
+              {post.excerpt}
+            </p>
+            <div className="mt-auto text-[10px] font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
+              READ DIARY <ChevronRight className="w-3 h-3" />
+            </div>
+          </div>
+        </div>
+      </Link>
+    ))}
+  </div>
+
+  <div className="mt-12 text-center">
+    <p className="text-xs text-ink-light opacity-60">
+      「1ヶ月後の私が、今の私を見て『懐かしい！』って笑ってくれますように。」
+    </p>
+  </div>
+</div>
+
+
+
+      {hasSearched && (
+        <div id="results-area" className="w-full mt-16 animate-in slide-in-from-bottom-8 fade-in duration-1000 scroll-mt-10">
+          <div className="text-center mb-10">
+            <h3 className="text-xl font-bold text-ink font-serif">あなたにぴったりの過ごし方</h3>
+            <p className="text-sm text-ink-light mt-2">{results.length}個のアイデアが見つかりました</p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-6 w-full pb-16 px-4 max-w-5xl mx-auto">
+            {results.map((hobby: any, index: number) => {
+              const imageUrl = getHobbyImageUrl(hobby.id);
+              return (
+                <Link href={`/hobbies/${hobby.id}`} key={hobby.id} className="block group" style={{ animationDelay: `${index * 100}ms` }}>
+                  <div className="relative p-6 bg-white rounded-2xl shadow-sm border border-border-light transition-all hover:shadow-md hover:-translate-y-2 flex flex-col h-full overflow-hidden">
+                    {imageUrl && (
+                      <div className="absolute inset-0 rounded-2xl bg-cover bg-center pointer-events-none" style={{ backgroundImage: `url(${imageUrl})`, opacity: 0.12 }} />
+                    )}
+                    <div className="relative z-10 flex flex-col h-full">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-cream flex items-center justify-center text-accent border border-border-light">
+                          {getHobbyIcon(hobby.tags || [])}
+                        </div>
+                        <h4 className="text-lg font-bold text-ink group-hover:text-accent">{hobby.name}</h4>
                       </div>
-                      <h4 className="text-lg font-bold text-ink group-hover:text-accent">{hobby.name}</h4>
-                    </div>
-                    <p className="text-sm text-ink-light leading-relaxed mb-6 flex-1 italic">
-                      「{renderFirstLineWithBold(hobby.pitch)}」
-                    </p>
-                    <div className="flex items-center gap-2 mb-4 text-xs">
-                      {hobby.tags?.map((t: string) => (
-                        <span key={t} className="px-2 py-1 bg-cream rounded border border-border-light/50 text-ink-light">{t}</span>
-                      ))}
-                    </div>
-                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-border-light border-dashed">
-                      <div className="flex items-center gap-1.5 text-xs text-ink-light">
-                        <Users className="w-3.5 h-3.5" />
-                        <span>約 {(hobby.global_active_users || 12000).toLocaleString()}人が楽しんでいます</span>
+                      <p className="text-sm text-ink-light leading-relaxed mb-6 flex-1 italic">
+                        「{renderFirstLineWithBold(hobby.pitch)}」
+                      </p>
+                      <div className="flex items-center gap-2 mb-4 text-xs">
+                        {hobby.tags?.map((t: string) => (
+                          <span key={t} className="px-2 py-1 bg-cream rounded border border-border-light/50 text-ink-light">{t}</span>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-border-light border-dashed">
+                        <div className="flex items-center gap-1.5 text-xs text-ink-light">
+                          <Users className="w-3.5 h-3.5" />
+                          <span>約 {(hobby.global_active_users || 12000).toLocaleString()}人が楽しんでいます</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* --- ハルのHobbyFlow日記 セクション --- */}
-      <section className="max-w-6xl mx-auto py-24 px-6 border-t border-border-light">
-        <div className="mb-12 text-center md:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cream border border-accent/20 text-accent text-xs font-bold mb-4">
-            <Sparkles className="w-3 h-3" /> OFFICIAL AMBASSADOR DIARY
-          </div>
-          <h2 className="text-3xl font-serif font-bold text-ink">ハルのHobbyFlow日記</h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {blogPosts.map((post) => (
-            <button
-              key={post.id}
-              onClick={() => setSelectedBlog(post)}
-              className="group relative h-80 w-full rounded-[2rem] overflow-hidden text-left shadow-md hover:shadow-2xl transition-all duration-500"
-            >
-              <div className="absolute inset-0">
-                <img 
-                  src={getBlogImage(post)} 
-                  alt="" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" 
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/40 to-ink/20 group-hover:via-ink/30 transition-colors" />
-                <div className="absolute inset-0 backdrop-blur-[1px] group-hover:backdrop-blur-none transition-all duration-500" />
-              </div>
-
-              <div className="relative h-full p-10 flex flex-col justify-end text-white">
-                <span className="text-[10px] font-bold tracking-[0.3em] opacity-70 mb-3">{post.date}</span>
-                <h3 className="text-2xl font-bold leading-tight mb-4 group-hover:text-accent transition-colors">
-                  {post.title}
-                </h3>
-                <p className="text-sm text-white/70 line-clamp-2 italic font-light max-w-sm mb-6">
-                  {post.excerpt}
-                </p>
-                <div className="flex items-center text-xs font-bold tracking-widest text-accent">
-                  READ STORY <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-2 transition-transform" />
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* --- ブログ閲覧用モーダル --- */}
-      {selectedBlog && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8">
-          <div className="absolute inset-0 bg-ink/80 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setSelectedBlog(null)} />
-          
-          <div className="relative bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-2xl animate-in slide-in-from-bottom-8 duration-500">
-            <button 
-              onClick={() => setSelectedBlog(null)}
-              className="absolute top-6 right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white transition-all z-20"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            <div className="h-72 sm:h-96 w-full relative">
-              <img src={getBlogImage(selectedBlog)} alt="" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
-            </div>
-
-            <div className="px-8 sm:px-16 pb-20 -mt-16 relative">
-              <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-border-light">
-                <span className="text-sm font-bold text-accent tracking-tighter mb-4 block">{selectedBlog.date}</span>
-                <h2 className="text-3xl sm:text-4xl font-serif font-bold text-ink mb-12 leading-snug">
-                  {selectedBlog.title}
-                </h2>
-
-                <div className="space-y-16 text-ink-light leading-loose text-base sm:text-lg">
-                  {selectedBlog.content.map((sec, i) => (
-                    <div key={i} className="group">
-                      <h4 className="font-bold text-ink text-xl mb-4 flex items-center gap-3">
-                        <span className="w-8 h-[1px] bg-accent/30" /> {sec.sectionTitle}
-                      </h4>
-                      <p className="whitespace-pre-wrap pl-11">{sec.text}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-20 p-10 bg-cream rounded-[2rem] border border-accent/10">
-                  <p className="italic text-ink leading-relaxed font-serif text-lg">
-                    「{selectedBlog.conclusion}」
-                  </p>
-                </div>
-
-                <div className="mt-16 flex flex-col items-center border-t border-dashed border-border-light pt-12">
-                  <p className="text-sm text-ink-light mb-6 font-bold">この趣味のアイテムや漫画をチェックする</p>
-                  <Link 
-                    href={`/hobbies/${selectedBlog.hobbyId}`}
-                    className="group flex items-center gap-3 px-10 py-5 bg-ink text-white rounded-full font-bold hover:bg-accent transition-all shadow-xl hover:shadow-accent/30"
-                  >
-                    この趣味のページを見る
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </div>
-              </div>
-            </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}
-
-      {showComingSoon && <ComingSoonModal onClose={() => setShowComingSoon(false)} />}
     </div>
   );
 }

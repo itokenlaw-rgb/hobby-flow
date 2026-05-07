@@ -31,7 +31,7 @@ const getHobbyImageUrl = (hobbyId: string): string | null => {
   return `/hobby_image_${num}.jpg`;
 };
 
-// --- ブログ記事データ（審査対策用） ---
+// --- ブログ記事データ ---
 const blogPosts = [
   {
     id: "jisha-meguri",
@@ -133,36 +133,59 @@ export default function ExplorePage() {
             <p className="text-sm text-ink-light mt-2">{results.length}個のアイデアが見つかりました</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-6 w-full pb-16 px-4 max-w-5xl mx-auto">
-            {results.map((hobby: any, index: number) => (
-              <Link href={`/hobbies/${hobby.id}`} key={hobby.id} className="block group">
-                <div className="relative p-6 bg-white rounded-2xl shadow-sm border border-border-light transition-all hover:shadow-md hover:-translate-y-2 flex flex-col h-full overflow-hidden">
-                  <div className="relative z-10 flex flex-col h-full">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-cream flex items-center justify-center text-accent border border-border-light">
-                        {getHobbyIcon(hobby.tags || [])}
+            {results.map((hobby: any) => {
+              const imageUrl = getHobbyImageUrl(hobby.id);
+              return (
+                <Link href={`/hobbies/${hobby.id}`} key={hobby.id} className="block group">
+                  <div className="relative p-6 bg-white rounded-2xl shadow-sm border border-border-light transition-all hover:shadow-md hover:-translate-y-2 flex flex-col h-64 overflow-hidden">
+                    
+                    {/* ★ 背景画像：以前のスタイルを復元 */}
+                    {imageUrl && (
+                      <div className="absolute inset-0 z-0 overflow-hidden">
+                        <img 
+                          src={imageUrl} 
+                          alt="" 
+                          className="w-full h-full object-cover opacity-[0.12] group-hover:scale-110 transition-transform duration-700 group-hover:opacity-20"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent" />
                       </div>
-                      <h4 className="text-lg font-bold text-ink group-hover:text-accent">{hobby.name}</h4>
-                    </div>
-                    <div className="flex items-center gap-2 mb-4 text-xs">
-                      {hobby.tags?.map((t: string) => (
-                        <span key={t} className="px-2 py-1 bg-cream rounded border border-border-light/50 text-ink-light">{t}</span>
-                      ))}
-                    </div>
-                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-border-light border-dashed">
-                      <div className="flex items-center gap-1.5 text-xs text-ink-light">
-                        <Users className="w-3.5 h-3.5" />
-                        <span>約 {(hobby.global_active_users || 12000).toLocaleString()}人が楽しんでいます</span>
+                    )}
+
+                    <div className="relative z-10 flex flex-col h-full">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-cream flex items-center justify-center text-accent border border-border-light shadow-inner">
+                          {getHobbyIcon(hobby.tags || [])}
+                        </div>
+                        <h4 className="text-lg font-bold text-ink group-hover:text-accent transition-colors">{hobby.name}</h4>
+                      </div>
+
+                      {/* 説明文を追加 */}
+                      <p className="text-sm text-ink-light leading-relaxed line-clamp-3 mb-4 italic">
+                        {hobby.pitch?.replace(/<<|>>/g, '')}
+                      </p>
+
+                      <div className="flex items-center gap-2 mb-4 text-[10px]">
+                        {hobby.tags?.map((t: string) => (
+                          <span key={t} className="px-2 py-0.5 bg-white/60 backdrop-blur-sm rounded border border-border-light text-ink-light">{t}</span>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-border-light/50 border-dashed">
+                        <div className="flex items-center gap-1.5 text-[10px] text-ink-light/80 font-medium">
+                          <Users className="w-3 h-3" />
+                          <span>約 {(hobby.global_active_users || 12000).toLocaleString()}人が参加中</span>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-accent transform translate-x-0 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* ブログ記事セクション（審査対策：記事数と人間味をアピール） */}
+      {/* ブログ記事セクション */}
       {!hasSearched && (
         <div className="w-full max-w-4xl mt-24 px-4 pb-20">
           <div className="flex items-center gap-3 mb-8">

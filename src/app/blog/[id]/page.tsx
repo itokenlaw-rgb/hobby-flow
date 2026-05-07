@@ -5,8 +5,8 @@ import Image from 'next/image';
 import { ArrowLeft, ArrowRight, Calendar, Compass } from 'lucide-react';
 import hobbiesData from '@/data/hobbies.json';
 
-// ── 静的パスの生成 ───────────────────────────────────────────────
-export function generateStaticParams() {
+// ── 静的パスの生成（これがないと404になる）───────────────────────
+export async function generateStaticParams() {
   return blogPosts.map((post) => ({ id: post.id }));
 }
 
@@ -17,16 +17,19 @@ function getHobbyImageUrl(hobbyId: string): string {
   return `/hobby_image_${String(index + 1).padStart(3, '0')}.jpg`;
 }
 
-// ── ページ本体 ───────────────────────────────────────────────────
-export default function BlogDetailPage({
+// ── ページ本体（Next.js 15: params は Promise<{id:string}>）──────
+export default async function BlogDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const post = blogPosts.find((p) => p.id === params.id);
+  // Next.js 15ではparamsをawaitする必要がある
+  const { id } = await params;
+
+  const post = blogPosts.find((p) => p.id === id);
   if (!post) notFound();
 
-  // 画像：imageOverride が設定されていればそちらを、なければ趣味画像を流用
+  // 画像：imageOverride があればそちらを、なければ趣味画像を流用
   const heroImage = post.imageOverride || getHobbyImageUrl(post.hobbyId);
 
   // 関連する趣味データ

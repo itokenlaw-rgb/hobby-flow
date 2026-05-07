@@ -54,27 +54,30 @@ export default function MossimoLinkBox({ html }: { html: string }) {
         return true;
       } catch (e) {
         console.warn('[MossimoLinkBox] msmaflink実行エラー:', e);
-        return false;
+        return true;
       }
     };
 
     // ── Step 4: bundle.js の状態で分岐 ─────────────────────────
     const existingBundle = document.getElementById(BUNDLE_ID);
+    let retryInterval: NodeJS.Timeout | null = null;
+
+    const startPolling = (maxAttempts: number) => {
+      let attempts = 0;
+      if (execWithArgs()) return;
+      
+      retryInterval = setInterval(() => {
+        attempts++;
+        if (execWithArgs() || attempts >= maxAttempts) {
+          if (retryInterval) clearInterval(retryInterval);
+        }
+      }, 100);
+    };
 
     if (existingBundle) {
-      // SPA遷移時：bundle.jsは読み込み済み → すぐ実行、ダメなら少し待ってリトライ
-      if (!execWithArgs()) {
-        // msmaflink関数がまだ定義されていない場合は待機してリトライ
-        let attempts = 0;
-        const retry = setInterval(() => {
-          attempts++;
-          if (execWithArgs() || attempts >= 20) {
-            clearInterval(retry);
-          }
-        }, 100); // 100ms × 20回 = 最大2秒待つ
-
-        return () => clearInterval(retry);
-      }
+      // SPA遷移時：すでにscriptタグが存在する場合は、ロード済みかロード中。
+      // 最大10秒間、msmaflink関数が定義されるのを待機して実行する。
+      startPolling(100);
     } else {
       // 初回アクセス：bundle.jsをロードしてから実行
       const script = document.createElement('script');
@@ -82,11 +85,15 @@ export default function MossimoLinkBox({ html }: { html: string }) {
       script.src = BUNDLE_URL;
       script.async = true;
       script.onload = () => {
-        // ロード直後は初期化処理が走るため少し待つ
-        setTimeout(execWithArgs, 150);
+        // ロード完了後も初期化にラグがある可能性を考慮して最大5秒待機
+        startPolling(50);
       };
       document.body.appendChild(script);
     }
+
+    return () => {
+      if (retryInterval) clearInterval(retryInterval);
+    };
   }, [html]);
 
   return (

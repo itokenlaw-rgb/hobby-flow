@@ -6,10 +6,14 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, Clock, Wallet, BookOpen, ShoppingBag, Sparkles, PenLine } from 'lucide-react';
 import MossimoLinkBox from '@/components/MossimoLinkBox';
 
-const AMAZON_TRACKING_ID = 'hobbyflow-22';
+// ── Amazonアフィリエイト設定 ─────────────────────────────────────
+// もしもアフィリエイト経由Amazon（a_id/p_id/pc_id/pl_id は固定）
+const MOSHIMO_AMAZON_A_ID = '5519449';
 
-const getAmazonUrl = (asin: string) =>
-  `https://www.amazon.co.jp/dp/${asin}?tag=${AMAZON_TRACKING_ID}`;
+const getAmazonUrl = (asin: string) => {
+  const targetUrl = `https://www.amazon.co.jp/dp/${asin}/`;
+  return `https://af.moshimo.com/af/c/click?a_id=${MOSHIMO_AMAZON_A_ID}&p_id=170&pc_id=185&pl_id=27060&url=${encodeURIComponent(targetUrl)}`;
+};
 
 // ── もしもアフィリエイト設定 ─────────────────────────────────────
 const MOSHIMO_RAKUTEN_A_ID = '5519447';

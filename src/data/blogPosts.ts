@@ -639,7 +639,7 @@ export const blogPosts: BlogPost[] = [
     id: "blog-movie-immersion",
     hobbyId: "a5873c41-f327-4a81-8a04-1f2ddae4401a", // 映画鑑賞のID
     title: "映画鑑賞:現実を忘れる2時間。スクリーンの光で「感性」を再起動",
-    date: "2026.05.17",
+    date: "2026.04.17",
     excerpt: "平日の事務仕事で使い切った感情を、物語の力で満たしていく。自宅を劇場に変えて、誰かの人生を追体験する贅沢。",
     content: [
       {
@@ -677,7 +677,7 @@ export const blogPosts: BlogPost[] = [
     id: "blog-yoga-detox",
     hobbyId: "a2a3194f-04f3-45e2-8923-74da58ec1894", // ヨガのID
     title: "ヨガ:呼吸の数を数えて。凝り固まった「心と体」のキャッシュクリア",
-    date: "2026.05.18",
+    date: "2026.04.18",
     excerpt: "デスクワークでガチガチになった肩。物理的な「重さ」を感じる日常から、呼吸一つで自分をメンテナンスする時間。",
     content: [
       {
@@ -715,7 +715,7 @@ export const blogPosts: BlogPost[] = [
     id: "blog-programming-magic",
     hobbyId: "53536158-42a4-42b0-98c9-3bde3703a6cb", // プログラミングのID
     title: "プログラミング:現代の「魔法の杖」。論理で描く私のクリエイティブ",
-    date: "2026.05.19",
+    date: "2026.04.19",
     excerpt: "使う側から「作る側」へ。キーボードで紡ぐ論理のパズル。思い通りに動いた瞬間の、脳が再起動するような快感。",
     content: [
       {
@@ -752,7 +752,7 @@ export const blogPosts: BlogPost[] = [
     id: "blog-language-learning",
     hobbyId: "0d276c68-b912-49ce-be68-34ed1b79101f", // 外国語学習のID
     title: "外国語学習:世界の見方を変えるレンズ。雑音を「意味」に変える冒険",
-    date: "2026.05.20",
+    date: "2026.04.20",
     excerpt: "SNSで流れる異国の言葉を、ただの雑音から「心の機微」へ。1日15分の積み重ねで見つけた、新しい自分へのパスポート。",
     content: [
       {

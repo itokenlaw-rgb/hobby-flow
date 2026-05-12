@@ -449,7 +449,7 @@ export const blogPosts: BlogPost[] = [
     id: "blog-sports-stadium",
     hobbyId: "7deb2692-9830-4733-84fe-891ba51ed830", // スポーツ観戦のID
     title: "スポーツ観戦:筋書きのないドラマに叫ぶ。スタジアムで心をととのえる",
-    date: "2026.05.13",
+    date: "2026.05.10",
     excerpt: "正解のある事務職から、予測不能な「熱狂」へログアウト。数万人の歓声に包まれる、最強の脳内デトックス体験。",
     content: [
       {

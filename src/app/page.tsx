@@ -65,9 +65,10 @@ export default function ExplorePage() {
   return (
     <div className="flex flex-col items-center min-h-[70vh] animate-in fade-in duration-700">
       
-      {/* ヒーローセクション */}
-      <div className={`w-full max-w-2xl transition-all duration-700 flex flex-col items-center ${hasSearched ? '-translate-y-8 opacity-90' : 'translate-y-12'}`}>
-        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-ink mb-12 tracking-widest text-center">今日はなにする？</h2>
+{/* ヒーローセクション */}
+{/* translate-y-12 を translate-y-6 に変更（約24px分、上に上がります） */}
+<div className={`w-full max-w-2xl transition-all duration-700 flex flex-col items-center ${hasSearched ? '-translate-y-8 opacity-90' : 'translate-y-6'}`}>
+  <h2 className="text-3xl sm:text-4xl font-serif font-bold text-ink mb-12 tracking-widest text-center">今日はなにする？</h2>
 
         <div className="w-full space-y-8 bg-white p-8 rounded-3xl shadow-sm border border-border-light relative z-10">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">

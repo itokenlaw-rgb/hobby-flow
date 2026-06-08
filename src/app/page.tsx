@@ -83,7 +83,7 @@ export default function ExplorePage() {
               <label className="text-xs text-ink-light font-bold">費用</label>
               <div className="flex rounded-full border border-border-light overflow-hidden">
                 <button onClick={() => setCost(cost === 'low' ? null : 'low')} className={`flex-1 py-2 text-sm ${cost === 'low' ? 'bg-ink text-white' : 'text-ink-light'}`}>お手軽</button>
-                <button onClick={() => setCost(cost === 'high' ? null : 'high')} className={`flex-1 py-2 text-sm ${cost === 'high' ? 'bg-ink text-white' : 'text-ink-light'}`}>豪華</button>
+                <button onClick={() => setCost(cost === 'high' ? null : 'high')} className={`flex-1 py-2 text-sm ${cost === 'high' ? 'bg-ink text-white' : 'text-ink-light'}`}>豪華に</button>
               </div>
             </div>
             <div className="flex flex-col gap-3 text-center">

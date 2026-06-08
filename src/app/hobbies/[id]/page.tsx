@@ -257,7 +257,7 @@ export default async function HobbyDetail({
           {/* もしもアフィリエイトHTMLがあればそちらを優先、なければ自前ボタン */}
           {hobby.comic.asin && (
             hobby.comic.msmaflink_html
-              ? <MossimoLinkBox html={hobby.comic.msmaflink_html} />
+              ? <MossimoLinkBox html={hobby.comic.msmaflink_html} asin={hobby.comic.asin} />
               : <MultiLinkBox
                   name={hobby.comic.title}
                   amazonTitle={hobby.comic.amazon_title}
@@ -307,7 +307,7 @@ export default async function HobbyDetail({
           <div className="flex flex-col gap-4">
             {hobby.recommend_items.map((item: any, i: number) => (
               item.msmaflink_html
-                ? <MossimoLinkBox key={i} html={item.msmaflink_html} />
+                ? <MossimoLinkBox key={i} html={item.msmaflink_html} asin={item.asin} />
                 : <MultiLinkBox
                     key={i}
                     name={item.name}

@@ -2,7 +2,9 @@
 
 import { useEffect } from 'react';
 
-export default function MossimoLinkBox({ html }: { html: string }) {
+const AMAZON_TRACKING_ID = 'hobbyflow-22';
+
+export default function MossimoLinkBox({ html, asin }: { html: string; asin?: string }) {
   useEffect(() => {
     // もしもアフィリエイトのスクリプトを再実行するための処理
     try {
@@ -23,9 +25,24 @@ export default function MossimoLinkBox({ html }: { html: string }) {
   }, [html]); // htmlが変わるたびに実行
 
   return (
-    <div 
-      className="moshimo-container my-4 min-h-[150px]" 
-      dangerouslySetInnerHTML={{ __html: html }} 
-    />
+    <div className="my-4">
+      {/* Amazonボタンだけ自前で追加 */}
+      {asin && (
+        <a
+          href={`https://www.amazon.co.jp/dp/${asin}?tag=${AMAZON_TRACKING_ID}`}
+          target="_blank"
+          rel="noopener noreferrer sponsored"
+          className="flex items-center justify-center w-full py-2 px-3 rounded-lg text-[11px] font-bold text-white mb-2 hover:opacity-90 transition-opacity"
+          style={{ backgroundColor: '#FF9900' }}
+        >
+          Amazonで見る
+        </a>
+      )}
+      {/* 楽天・Yahoo! はもしもHTMLのまま */}
+      <div
+        className="moshimo-container min-h-[150px]"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </div>
   );
 }

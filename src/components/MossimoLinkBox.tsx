@@ -8,83 +8,74 @@ export default function MossimoLinkBox({ html, asin }: { html: string; asin?: st
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // もしもアフィリエイトのスクリプトを実行
-    const runMoshimo = () => {
-      try {
-        if ((window as any).msmaflink) {
-          (window as any).msmaflink();
-        } else {
-          if (!document.getElementById('moshimo-bundle')) {
-            const script = document.createElement('script');
-            script.src = '//dn.msmstatic.com/site/cardlink/bundle.js?20220329';
-            script.id = 'moshimo-bundle';
-            script.async = true;
-            document.body.appendChild(script);
-          }
-        }
-      } catch (e) {
-        console.error('Moshimo script error:', e);
+    try {
+      if ((window as any).msmaflink) {
+        (window as any).msmaflink();
+      } else if (!document.getElementById('moshimo-bundle')) {
+        const script = document.createElement('script');
+        script.src = '//dn.msmstatic.com/site/cardlink/bundle.js?20220329';
+        script.id = 'moshimo-bundle';
+        script.async = true;
+        document.body.appendChild(script);
       }
-    };
+    } catch (e) {
+      console.error('Moshimo script error:', e);
+    }
+  }, [html]);
 
-    runMoshimo();
-
+  useEffect(() => {
     if (!asin || !containerRef.current) return;
 
-    const injectAmazonBtn = () => {
+    const injectBtn = () => {
       const container = containerRef.current;
-      if (!container) return;
+      if (!container || container.querySelector('.amazon-inject-btn')) return;
 
-      // すでに挿入済みならスキップ
-      if (container.querySelector('.amazon-inject-btn')) return;
+      // もしもが生成するボタン（<a>タグ）を探す
+      const existingBtns = container.querySelectorAll('a[href*="moshimo"], a[href*="rakuten"], a[href*="yahoo"], a[href*="af.moshimo"]');
 
-      // もしもが生成するボタンラッパーを探す
-      const btnArea =
-        container.querySelector('.buttons') ||        // もしも標準クラス
-        container.querySelector('.link-buttons') ||
-        container.querySelector('[class*="button"]');
+      if (existingBtns.length === 0) return; // まだ描画されていない
 
-      if (!btnArea) return;
+      // 最初のボタンを基準にサイズ・スタイルを合わせる
+      const refBtn = existingBtns[0] as HTMLElement;
+      const refStyle = window.getComputedStyle(refBtn);
 
-      // もしもの親要素（.buttons）がフレックスボックスになっているため、
-      // 他のボタンと同じように等幅で並ぶようスタイルを設定します
       const amazonBtn = document.createElement('a');
       amazonBtn.href = `https://www.amazon.co.jp/dp/${asin}?tag=${AMAZON_TRACKING_ID}`;
       amazonBtn.target = '_blank';
       amazonBtn.rel = 'noopener noreferrer sponsored';
       amazonBtn.className = 'amazon-inject-btn';
       amazonBtn.textContent = 'Amazonで見る';
-      
-      // もしもボタン（縦横サイズ・文字、および flex 子要素としての挙動）に合わせるスタイル
       amazonBtn.style.cssText = `
-        display: block;
-        flex: 1 1 0%;
-        min-width: 80px;
-        padding: 10px 12px;
-        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         background-color: #FF9900;
         color: #fff;
-        font-size: 12px;
-        font-weight: 700;
-        text-align: center;
+        font-weight: ${refStyle.fontWeight || '700'};
+        font-size: ${refStyle.fontSize || '12px'};
+        font-family: ${refStyle.fontFamily};
+        border-radius: ${refStyle.borderRadius || '6px'};
+        padding: ${refStyle.padding || '10px 12px'};
+        height: ${refStyle.height !== 'auto' ? refStyle.height : 'auto'};
+        min-height: ${refStyle.minHeight || 'unset'};
+        width: ${refStyle.width !== 'auto' ? refStyle.width : 'auto'};
+        flex: ${refStyle.flex || '1'};
         text-decoration: none;
         box-sizing: border-box;
-        margin: 0; /* もしもの既存marginとの競合を防ぐ */
+        text-align: center;
+        cursor: pointer;
       `;
 
-      // 既存のボタンエリアの最初（左側）に挿入して3つ並びにします
-      btnArea.insertBefore(amazonBtn, btnArea.firstChild);
+      // ボタンの親（flex コンテナ）の先頭に挿入
+      const btnParent = refBtn.parentElement;
+      if (btnParent) {
+        btnParent.insertBefore(amazonBtn, btnParent.firstChild);
+      }
     };
 
-    // もしもスクリプトの描画を待ってから挿入（MutationObserver で監視）
-    const observer = new MutationObserver(() => {
-      injectAmazonBtn();
-    });
-
+    const observer = new MutationObserver(injectBtn);
     observer.observe(containerRef.current, { childList: true, subtree: true });
-
-    // 念のため遅延でも試みる
-    const timer = setTimeout(injectAmazonBtn, 1500);
+    const timer = setTimeout(injectBtn, 1500);
 
     return () => {
       observer.disconnect();

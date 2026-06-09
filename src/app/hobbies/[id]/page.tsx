@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Clock, Wallet, BookOpen, ShoppingBag, Sparkles, PenLine } from 'lucide-react';
 import MossimoLinkBox from '@/components/MossimoLinkBox';
+import { blogPosts } from '@/data/blogPosts';
 
 const AMAZON_TRACKING_ID = 'hobbyflow-22';
 
@@ -268,28 +269,6 @@ export default async function HobbyDetail({
         </div>
       )}
 
-      {/* ③ YouTube：元のpage.tsxと同じ方式 */}
-      <div className="bg-white p-4 rounded-xl border border-border-light shadow-sm mb-5">
-        <h3 className="flex items-center gap-2 font-bold text-ink mb-2">
-          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-[#FF0000]">
-            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-          </svg>
-          動画で学ぶ
-        </h3>
-        <p className="text-sm text-ink-light mb-3 leading-relaxed">
-          はじめてでも安心。動画で{hobby.name}の始め方やコツをチェックしてみましょう。
-        </p>
-        <a
-          href={youtube.search_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-white font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
-          style={{ backgroundColor: '#FF0000' }}
-        >
-          動画を検索
-        </a>
-      </div>
-
       {/* ④ おすすめグッズ：goods 紹介文 → MultiLinkBox の順 */}
       <div className="mb-6">
         <h3 className="flex items-center gap-2 font-bold text-ink mb-3">
@@ -319,6 +298,65 @@ export default async function HobbyDetail({
           </div>
         )}
       </div>
+
+      {/* ③ YouTube：元のpage.tsxと同じ方式 */}
+      <div className="bg-white p-4 rounded-xl border border-border-light shadow-sm mb-5">
+        <h3 className="flex items-center gap-2 font-bold text-ink mb-2">
+          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-[#FF0000]">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+          </svg>
+          動画で学ぶ
+        </h3>
+        <p className="text-sm text-ink-light mb-3 leading-relaxed">
+          はじめてでも安心。動画で{hobby.name}の始め方やコツをチェックしてみましょう。
+        </p>
+        <a
+          href={youtube.search_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-white font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
+          style={{ backgroundColor: '#FF0000' }}
+        >
+          動画を検索
+        </a>
+      </div>
+
+      {/* 関連ブログ記事 */}
+      {(() => {
+        const relatedPost = blogPosts.find((p) => p.hobbyId === hobby.id);
+        if (!relatedPost) return null;
+        return (
+          <div className="mb-5">
+            <h3 className="flex items-center gap-2 font-bold text-ink mb-3 text-sm">
+              <BookOpen className="w-5 h-5 text-accent" />
+              体験記を読む
+            </h3>
+            <Link
+              href={`/blog/${relatedPost.id}`}
+              className="group flex gap-4 p-4 bg-white rounded-xl border border-border-light hover:border-accent/40 hover:shadow-md transition-all overflow-hidden"
+            >
+              <div className="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden">
+                <Image
+                  src={imageUrl}
+                  alt={relatedPost.title}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  unoptimized
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] text-ink-light/50 mb-1">{relatedPost.date} · 体験記</p>
+                <p className="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug line-clamp-2">
+                  {relatedPost.title}
+                </p>
+                <p className="text-xs text-ink-light mt-1 line-clamp-2 leading-relaxed">
+                  {relatedPost.excerpt}
+                </p>
+              </div>
+            </Link>
+          </div>
+        );
+      })()}
 
       {/* AIパートナーセクション */}
       <div className="p-4 bg-ink text-cream rounded-2xl relative overflow-hidden shadow-xl">

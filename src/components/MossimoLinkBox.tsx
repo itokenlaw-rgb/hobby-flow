@@ -80,14 +80,14 @@ export default function MossimoLinkBox({ html, asin }: { html: string; asin?: st
           <p className="text-sm font-bold text-ink leading-snug">{title}</p>
           <p className="text-[10px] text-ink-light/50 mt-0.5">posted with HobbyFlow</p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           {buttons.map((btn, i) => (
             <a
               key={i}
               href={btn.url}
               target="_blank"
               rel="noopener noreferrer sponsored"
-              className="flex-1 min-w-[80px] text-center py-2 px-3 rounded-lg text-[11px] font-bold text-white hover:opacity-90 transition-opacity"
+              className="flex-1 text-center py-2 px-3 rounded-lg text-[11px] font-bold text-white hover:opacity-90 transition-opacity whitespace-nowrap"
               style={{ backgroundColor: btn.color }}
             >
               {btn.label}

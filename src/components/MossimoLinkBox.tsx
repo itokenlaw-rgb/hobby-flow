@@ -29,7 +29,6 @@ export default function MossimoLinkBox({ html, asin }: { html: string; asin?: st
 
     runMoshimo();
 
-    // もしもHTMLが描画されてボタンが出たあと、Amazonボタンを先頭に挿入する
     if (!asin || !containerRef.current) return;
 
     const injectAmazonBtn = () => {
@@ -39,24 +38,29 @@ export default function MossimoLinkBox({ html, asin }: { html: string; asin?: st
       // すでに挿入済みならスキップ
       if (container.querySelector('.amazon-inject-btn')) return;
 
-      // もしもが生成するボタンラッパーを探す（複数パターン対応）
+      // もしもが生成するボタンラッパーを探す
       const btnArea =
         container.querySelector('.buttons') ||        // もしも標準クラス
         container.querySelector('.link-buttons') ||
         container.querySelector('[class*="button"]');
 
+      if (!btnArea) return;
+
+      // もしもの親要素（.buttons）がフレックスボックスになっているため、
+      // 他のボタンと同じように等幅で並ぶようスタイルを設定します
       const amazonBtn = document.createElement('a');
       amazonBtn.href = `https://www.amazon.co.jp/dp/${asin}?tag=${AMAZON_TRACKING_ID}`;
       amazonBtn.target = '_blank';
       amazonBtn.rel = 'noopener noreferrer sponsored';
       amazonBtn.className = 'amazon-inject-btn';
       amazonBtn.textContent = 'Amazonで見る';
-      // もしもボタンと同じ見た目に合わせるスタイル
+      
+      // もしもボタン（縦横サイズ・文字、および flex 子要素としての挙動）に合わせるスタイル
       amazonBtn.style.cssText = `
         display: block;
-        width: 100%;
+        flex: 1 1 0%;
+        min-width: 80px;
         padding: 10px 12px;
-        margin-bottom: 8px;
         border-radius: 6px;
         background-color: #FF9900;
         color: #fff;
@@ -65,15 +69,11 @@ export default function MossimoLinkBox({ html, asin }: { html: string; asin?: st
         text-align: center;
         text-decoration: none;
         box-sizing: border-box;
+        margin: 0; /* もしもの既存marginとの競合を防ぐ */
       `;
 
-      if (btnArea) {
-        // ボタンエリアの最初の子として挿入
-        btnArea.insertBefore(amazonBtn, btnArea.firstChild);
-      } else {
-        // ボタンエリアが見つからない場合はコンテナ末尾に追加
-        container.appendChild(amazonBtn);
-      }
+      // 既存のボタンエリアの最初（左側）に挿入して3つ並びにします
+      btnArea.insertBefore(amazonBtn, btnArea.firstChild);
     };
 
     // もしもスクリプトの描画を待ってから挿入（MutationObserver で監視）

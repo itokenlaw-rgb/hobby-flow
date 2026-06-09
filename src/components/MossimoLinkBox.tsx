@@ -1,87 +1,100 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-
 const AMAZON_TRACKING_ID = 'hobbyflow-22';
 
-export default function MossimoLinkBox({ html, asin }: { html: string; asin?: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+// msmaflink_html の中の JSON パラメータを解析する
+function parseMsmHtml(html: string, asin?: string) {
+  try {
+    const match = html.match(/msmaflink\((\{[\s\S]*?\})\);/);
+    if (!match) return null;
+    const data = JSON.parse(match[1]);
 
-  useEffect(() => {
-    try {
-      if ((window as any).msmaflink) {
-        (window as any).msmaflink();
-      } else if (!document.getElementById('moshimo-bundle')) {
-        const script = document.createElement('script');
-        script.src = '//dn.msmstatic.com/site/cardlink/bundle.js?20220329';
-        script.id = 'moshimo-bundle';
-        script.async = true;
-        document.body.appendChild(script);
-      }
-    } catch (e) {
-      console.error('Moshimo script error:', e);
+    // 商品名
+    const title: string = data.n || '';
+
+    // 画像URL：d（ドメイン）+ c_p（共通パス）+ p[0]（最初の画像）
+    let imageUrl = '';
+    if (data.d && data.c_p && data.p?.[0]) {
+      imageUrl = data.d + data.c_p + data.p[0];
     }
-  }, [html]);
 
-  useEffect(() => {
-    if (!asin || !containerRef.current) return;
+    // ショップボタン一覧（楽天・Yahoo など）
+    const buttons: { label: string; url: string; color: string }[] =
+      (data.b_l || []).map((b: any) => ({
+        label: b.u_tx,
+        url: b.u_url,
+        color: b.u_bc,
+      }));
 
-    const injectBtn = () => {
-      const container = containerRef.current;
-      if (!container || container.querySelector('.amazon-inject-btn')) return;
+    // Amazon ボタンを先頭に追加
+    if (asin) {
+      buttons.unshift({
+        label: 'Amazonで見る',
+        url: `https://www.amazon.co.jp/dp/${asin}?tag=${AMAZON_TRACKING_ID}`,
+        color: '#FF9900',
+      });
+    }
 
-      // 楽天ボタンを探す（もしもHTMLの最初のボタン）
-      const rakutenBtn = container.querySelector('a[href*="rakuten"], a[href*="moshimo"]') as HTMLElement | null;
-      if (!rakutenBtn) return;
+    return { title, imageUrl, buttons };
+  } catch {
+    return null;
+  }
+}
 
-      const refStyle = window.getComputedStyle(rakutenBtn);
+export default function MossimoLinkBox({ html, asin }: { html: string; asin?: string }) {
+  const parsed = parseMsmHtml(html, asin);
 
-      const amazonBtn = document.createElement('a');
-      amazonBtn.href = `https://www.amazon.co.jp/dp/${asin}?tag=${AMAZON_TRACKING_ID}`;
-      amazonBtn.target = '_blank';
-      amazonBtn.rel = 'noopener noreferrer sponsored';
-      amazonBtn.className = 'amazon-inject-btn';
-      amazonBtn.textContent = 'Amazonで見る';
-      amazonBtn.style.cssText = `
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #FF9900;
-        color: #fff;
-        font-weight: ${refStyle.fontWeight || '700'};
-        font-size: ${refStyle.fontSize || '12px'};
-        font-family: ${refStyle.fontFamily};
-        border-radius: ${refStyle.borderRadius || '6px'};
-        padding: ${refStyle.padding || '10px 12px'};
-        height: ${refStyle.height !== 'auto' ? refStyle.height : 'auto'};
-        min-height: ${refStyle.minHeight || 'unset'};
-        width: ${refStyle.width !== 'auto' ? refStyle.width : 'auto'};
-        flex: ${refStyle.flex || '1'};
-        text-decoration: none;
-        box-sizing: border-box;
-        text-align: center;
-        cursor: pointer;
-        margin-right: ${refStyle.marginRight || '0'};
-        margin-bottom: ${refStyle.marginBottom || '0'};
-      `;
+  // パース失敗時はフォールバック（従来のHTML埋め込み）
+  if (!parsed) {
+    return (
+      <div
+        className="moshimo-container my-4 min-h-[150px]"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    );
+  }
 
-      // 楽天ボタンの直前に挿入
-      rakutenBtn.parentElement?.insertBefore(amazonBtn, rakutenBtn);
-    };
-
-    const observer = new MutationObserver(injectBtn);
-    observer.observe(containerRef.current, { childList: true, subtree: true });
-    const timer = setTimeout(injectBtn, 1500);
-
-    return () => {
-      observer.disconnect();
-      clearTimeout(timer);
-    };
-  }, [html, asin]);
+  const { title, imageUrl, buttons } = parsed;
 
   return (
-    <div ref={containerRef} className="moshimo-container my-4 min-h-[150px]">
-      <div dangerouslySetInnerHTML={{ __html: html }} />
+    <div className="bg-white rounded-2xl border border-border-light shadow-sm overflow-hidden flex flex-col sm:flex-row gap-4 p-4 hover:shadow-md transition-shadow my-4">
+      {/* 商品画像 */}
+      <div className="flex-shrink-0 flex items-center justify-center w-full sm:w-28 bg-cream/40 rounded-xl p-2">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={title}
+            referrerPolicy="no-referrer"
+            className="max-h-28 object-contain"
+          />
+        ) : (
+          <div className="text-[10px] text-ink-light/40 italic w-28 h-28 flex items-center justify-center">
+            No Image
+          </div>
+        )}
+      </div>
+
+      {/* タイトル＋ボタン */}
+      <div className="flex-1 flex flex-col justify-between gap-3">
+        <div>
+          <p className="text-sm font-bold text-ink leading-snug">{title}</p>
+          <p className="text-[10px] text-ink-light/50 mt-0.5">posted with HobbyFlow</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {buttons.map((btn, i) => (
+            <a
+              key={i}
+              href={btn.url}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              className="flex-1 min-w-[80px] text-center py-2 px-3 rounded-lg text-[11px] font-bold text-white hover:opacity-90 transition-opacity"
+              style={{ backgroundColor: btn.color }}
+            >
+              {btn.label}
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

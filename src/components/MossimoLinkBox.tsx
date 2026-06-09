@@ -30,14 +30,11 @@ export default function MossimoLinkBox({ html, asin }: { html: string; asin?: st
       const container = containerRef.current;
       if (!container || container.querySelector('.amazon-inject-btn')) return;
 
-      // もしもが生成するボタン（<a>タグ）を探す
-      const existingBtns = container.querySelectorAll('a[href*="moshimo"], a[href*="rakuten"], a[href*="yahoo"], a[href*="af.moshimo"]');
+      // 楽天ボタンを探す（もしもHTMLの最初のボタン）
+      const rakutenBtn = container.querySelector('a[href*="rakuten"], a[href*="moshimo"]') as HTMLElement | null;
+      if (!rakutenBtn) return;
 
-      if (existingBtns.length === 0) return; // まだ描画されていない
-
-      // 最初のボタンを基準にサイズ・スタイルを合わせる
-      const refBtn = existingBtns[0] as HTMLElement;
-      const refStyle = window.getComputedStyle(refBtn);
+      const refStyle = window.getComputedStyle(rakutenBtn);
 
       const amazonBtn = document.createElement('a');
       amazonBtn.href = `https://www.amazon.co.jp/dp/${asin}?tag=${AMAZON_TRACKING_ID}`;
@@ -64,13 +61,12 @@ export default function MossimoLinkBox({ html, asin }: { html: string; asin?: st
         box-sizing: border-box;
         text-align: center;
         cursor: pointer;
+        margin-right: ${refStyle.marginRight || '0'};
+        margin-bottom: ${refStyle.marginBottom || '0'};
       `;
 
-      // ボタンの親（flex コンテナ）の先頭に挿入
-      const btnParent = refBtn.parentElement;
-      if (btnParent) {
-        btnParent.insertBefore(amazonBtn, btnParent.firstChild);
-      }
+      // 楽天ボタンの直前に挿入
+      rakutenBtn.parentElement?.insertBefore(amazonBtn, rakutenBtn);
     };
 
     const observer = new MutationObserver(injectBtn);

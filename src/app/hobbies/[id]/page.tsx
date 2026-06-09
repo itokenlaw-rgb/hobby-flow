@@ -52,7 +52,7 @@ function MultiLinkBox({
           <img
             src={imageUrl}
             alt={displayTitle}
-            referrerPolicy="no-referrer"
+            referrerPolicy="no-referrer-when-downgrade"
             className="max-h-28 object-contain"
           />
         ) : (
@@ -230,7 +230,7 @@ export default async function HobbyDetail({
         <div className="bg-white p-6 rounded-2xl border border-border-light shadow-sm">
           <h3 className="flex items-center gap-2 font-bold text-ink mb-4">
             <Clock className="w-5 h-5 text-accent" />
-            自分の時間
+            所要時間
           </h3>
           <div className="text-sm text-ink-light">{formatParagraphsDark(hobby.duration)}</div>
         </div>

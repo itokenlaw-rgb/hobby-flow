@@ -14,8 +14,13 @@ function parseMsmHtml(html: string, asin?: string) {
 
     // 画像URL：d（ドメイン）+ c_p（共通パス）+ p[0]（最初の画像）
     let imageUrl = '';
-    if (data.d && data.c_p && data.p?.[0]) {
-      imageUrl = data.d + data.c_p + data.p[0];
+    if (data.d && data.p?.[0]) {
+      const base = data.d.replace(/\/$/, '');
+      const mid = (data.c_p || '').replace(/\/$/, '');
+      const img = data.p[0].startsWith('/') ? data.p[0] : '/' + data.p[0];
+      const candidate = base + mid + img;
+      // 簡易バリデーション：httpsで始まる場合のみ採用
+      if (candidate.startsWith('http')) imageUrl = candidate;
     }
 
     // ショップボタン一覧（楽天・Yahoo など）
@@ -64,7 +69,7 @@ export default function MossimoLinkBox({ html, asin }: { html: string; asin?: st
           <img
             src={imageUrl}
             alt={title}
-            referrerPolicy="no-referrer"
+            referrerPolicy="no-referrer-when-downgrade"
             className="max-h-28 object-contain"
           />
         ) : (

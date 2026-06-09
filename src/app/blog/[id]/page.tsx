@@ -36,20 +36,20 @@ export default async function BlogDetailPage({
   const relatedHobby = (hobbiesData as any[]).find((h) => h.id === post.hobbyId);
 
   return (
-    <div className="max-w-3xl mx-auto px-4 pb-20 animate-in fade-in duration-700">
+    <div className="max-w-3xl mx-auto px-2 sm:px-3 pb-10 animate-in fade-in duration-500">
 
       {/* 戻るリンク */}
       <Link
         href="/"
-        className="inline-flex items-center gap-2 text-sm text-ink-light hover:text-ink mb-8 transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-ink-light hover:text-ink mb-4 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" /> トップページに戻る
       </Link>
 
-      <article className="bg-white rounded-3xl shadow-sm border border-border-light overflow-hidden">
+      <article className="bg-white rounded-2xl shadow-sm border border-border-light overflow-hidden">
 
         {/* ── ヒーロー画像 ── */}
-        <div className="relative h-64 sm:h-80">
+        <div className="relative h-48 sm:h-64">
           <Image
             src={heroImage}
             alt={post.title}
@@ -59,23 +59,23 @@ export default async function BlogDetailPage({
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-8">
-            <div className="flex items-center gap-2 text-white/60 text-xs mb-3">
+          <div className="absolute bottom-0 left-0 right-0 p-4">
+            <div className="flex items-center gap-2 text-white/60 text-xs mb-2">
               <Calendar className="w-3.5 h-3.5" />
               <span>{post.date}</span>
               <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-white/80">体験記</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white leading-snug drop-shadow-md">
+            <h1 className="text-xl sm:text-2xl font-bold text-white leading-snug drop-shadow-md">
               {post.title}
             </h1>
           </div>
         </div>
 
         {/* ── 記事本文 ── */}
-        <div className="p-8 sm:p-12">
+        <div className="p-4 sm:p-6">
 
           {/* 執筆者バッジ */}
-          <div className="flex items-center gap-3 mb-10 pb-6 border-b border-border-light">
+          <div className="flex items-center gap-3 mb-5 pb-4 border-b border-border-light">
             <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center text-sm font-bold text-accent flex-shrink-0">
               ハ
             </div>
@@ -86,19 +86,19 @@ export default async function BlogDetailPage({
           </div>
 
           {/* 導入：excerpt */}
-          <p className="text-base text-ink-light italic leading-loose mb-10 pl-4 border-l-4 border-accent/30">
+          <p className="text-sm text-ink-light italic leading-relaxed mb-5 pl-3 border-l-4 border-accent/30">
             {post.excerpt}
           </p>
 
           {/* 各セクション */}
-          <div className="space-y-12">
+          <div className="space-y-7">
             {post.content.map((section, i) => (
-              <section key={i} className="space-y-4">
-                <h2 className="text-lg font-bold text-ink flex items-center gap-3">
+              <section key={i} className="space-y-2">
+                <h2 className="text-base font-bold text-ink flex items-center gap-3">
                   <span className="flex-shrink-0 w-1.5 h-6 bg-accent rounded-full" />
                   {section.sectionTitle}
                 </h2>
-                <div className="text-sm text-ink-light leading-loose tracking-wide whitespace-pre-wrap pl-5">
+                <div className="text-sm text-ink-light leading-relaxed tracking-wide whitespace-pre-wrap pl-4">
                   {section.text}
                 </div>
               </section>
@@ -106,8 +106,8 @@ export default async function BlogDetailPage({
           </div>
 
           {/* おわりに */}
-          <div className="mt-14 p-7 bg-cream/40 rounded-2xl border border-dashed border-border-light">
-            <h3 className="font-bold text-ink mb-3 text-sm flex items-center gap-2">
+          <div className="mt-6 p-4 bg-cream/40 rounded-xl border border-dashed border-border-light">
+            <h3 className="font-bold text-ink mb-2 text-sm flex items-center gap-2">
               <span className="text-accent">✦</span> おわりに
             </h3>
             <p className="text-sm text-ink-light italic leading-loose">
@@ -117,16 +117,16 @@ export default async function BlogDetailPage({
 
           {/* ── 関連する趣味ページへのリンク ── */}
           {relatedHobby && (
-            <div className="mt-12 pt-8 border-t border-border-light">
-              <p className="text-xs font-bold text-ink-light tracking-widest uppercase mb-4">
+            <div className="mt-6 pt-5 border-t border-border-light">
+              <p className="text-xs font-bold text-ink-light tracking-widest uppercase mb-2">
                 この記事の趣味を詳しく見る
               </p>
               <Link
                 href={`/hobbies/${relatedHobby.id}`}
-                className="group flex items-center gap-4 p-5 bg-white rounded-2xl border border-border-light hover:border-accent/40 hover:shadow-md transition-all"
+                className="group flex items-center gap-3 p-3 bg-white rounded-xl border border-border-light hover:border-accent/40 hover:shadow-md transition-all"
               >
                 {/* 趣味の画像サムネイル */}
-                <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 relative">
+                <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 relative">
                   <Image
                     src={heroImage}
                     alt={relatedHobby.name}
@@ -156,7 +156,7 @@ export default async function BlogDetailPage({
       </article>
 
       {/* ページ下部リンク */}
-      <div className="mt-10 text-center text-xs text-ink-light">
+      <div className="mt-5 text-center text-xs text-ink-light">
         この記事に関するご感想は
         <Link href="/policy" className="mx-1 text-accent underline underline-offset-4">
           プライバシーポリシー・お問い合わせ

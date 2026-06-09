@@ -44,26 +44,26 @@ function MultiLinkBox({
   const searchKeyword = amazonTitle || name;
 
   return (
-    <div className="bg-white rounded-xl border border-border-light shadow-sm overflow-hidden flex flex-col sm:flex-row gap-2 p-3 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-2xl border border-border-light shadow-sm overflow-hidden flex flex-col sm:flex-row gap-4 p-4 hover:shadow-md transition-shadow">
       {/* 画像 */}
-      <div className="flex-shrink-0 flex items-center justify-center w-full sm:w-20 bg-cream/40 rounded-lg p-1">
+      <div className="flex-shrink-0 flex items-center justify-center w-full sm:w-28 bg-cream/40 rounded-xl p-2">
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={imageUrl}
             alt={displayTitle}
             referrerPolicy="no-referrer-when-downgrade"
-            className="max-h-20 object-contain"
+            className="max-h-28 object-contain"
           />
         ) : (
-          <div className="text-[10px] text-ink-light/40 italic w-20 h-20 flex items-center justify-center">
+          <div className="text-[10px] text-ink-light/40 italic w-28 h-28 flex items-center justify-center">
             No Image
           </div>
         )}
       </div>
 
       {/* テキスト＋ボタン */}
-      <div className="flex-1 flex flex-col justify-between gap-2">
+      <div className="flex-1 flex flex-col justify-between gap-3">
         <div>
           <p className="text-sm font-bold text-ink leading-snug">{displayTitle}</p>
           <p className="text-[10px] text-ink-light/50 mt-0.5">posted with HobbyFlow</p>
@@ -173,12 +173,12 @@ export default async function HobbyDetail({
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-2 sm:px-3 pb-10 animate-in fade-in duration-500">
+    <div className="max-w-3xl mx-auto px-4 pb-20 animate-in fade-in duration-700">
 
       {/* ① ヒーローセクション：元のpage.tsxと同じ構成 */}
       <div
-        className="relative w-full rounded-2xl overflow-hidden shadow-xl mb-5"
-        style={{ minHeight: "320px" }}
+        className="relative w-full rounded-2xl overflow-hidden shadow-xl mb-8"
+        style={{ minHeight: '420px' }}
       >
         <Image
           src={imageUrl}
@@ -198,18 +198,18 @@ export default async function HobbyDetail({
             TOPに戻る
           </Link>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 p-3 space-y-2">
-          <h1 className="text-2xl font-bold text-white tracking-tight drop-shadow-md">
+        <div className="absolute bottom-0 left-0 right-0 p-6 space-y-3">
+          <h1 className="text-4xl font-bold text-white tracking-tight drop-shadow-md">
             {hobby.name}
           </h1>
-          <p className="text-xs text-white/80 italic drop-shadow">
+          <p className="text-base text-white/80 italic drop-shadow">
             {formatTextWithBold(catchphrase, 'text-white')}
           </p>
-          <div className="flex flex-wrap gap-2 pt-0.5">
+          <div className="flex flex-wrap gap-2 pt-1">
             {hobby.tags?.map((t: string) => (
               <span
                 key={t}
-                className="px-2 py-0.5 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-[10px] text-white shadow-sm"
+                className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-xs text-white shadow-sm"
               >
                 {t}
               </span>
@@ -220,22 +220,22 @@ export default async function HobbyDetail({
 
       {/* pitch 残り本文 */}
       {remainingPitch && (
-        <div className="text-ink text-lg leading-relaxed italic mb-5 px-1 border-b border-border-light pb-4">
+        <div className="text-ink text-lg leading-relaxed italic mb-10 px-1 border-b border-border-light pb-8">
           {formatParagraphsDark(remainingPitch)}
         </div>
       )}
 
       {/* 時間・予算 */}
-      <div className="grid sm:grid-cols-2 gap-3 mb-5">
-        <div className="bg-white p-4 rounded-xl border border-border-light shadow-sm">
-          <h3 className="flex items-center gap-2 font-bold text-ink mb-2">
+      <div className="grid sm:grid-cols-2 gap-6 mb-10">
+        <div className="bg-white p-6 rounded-2xl border border-border-light shadow-sm">
+          <h3 className="flex items-center gap-2 font-bold text-ink mb-4">
             <Clock className="w-5 h-5 text-accent" />
             所要時間
           </h3>
           <div className="text-sm text-ink-light">{formatParagraphsDark(hobby.duration)}</div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-border-light shadow-sm">
-          <h3 className="flex items-center gap-2 font-bold text-ink mb-2">
+        <div className="bg-white p-6 rounded-2xl border border-border-light shadow-sm">
+          <h3 className="flex items-center gap-2 font-bold text-ink mb-4">
             <Wallet className="w-5 h-5 text-accent" />
             必要予算
           </h3>
@@ -245,13 +245,13 @@ export default async function HobbyDetail({
 
       {/* ② 漫画セクション：description → リンクボックス の順 */}
       {hobby.comic?.title && (
-        <div className="bg-white p-4 rounded-xl border-l-4 border-l-accent border border-border-light shadow-sm mb-5">
-          <h3 className="flex items-center gap-2 font-bold text-ink mb-3">
+        <div className="bg-white p-8 rounded-2xl border-l-8 border-l-accent border border-border-light shadow-sm mb-10">
+          <h3 className="flex items-center gap-2 font-bold text-ink mb-6">
             <BookOpen className="w-5 h-5 text-accent" />
             インスピレーション：『{hobby.comic.title}』
           </h3>
           {/* description を先に表示 */}
-          <div className="text-sm text-ink-light leading-relaxed mb-3">
+          <div className="text-sm text-ink-light leading-relaxed mb-6">
             {formatParagraphsDark(hobby.comic.description)}
           </div>
           {/* もしもアフィリエイトHTMLがあればそちらを優先、なければ自前ボタン */}
@@ -269,21 +269,21 @@ export default async function HobbyDetail({
       )}
 
       {/* ③ YouTube：元のpage.tsxと同じ方式 */}
-      <div className="bg-white p-4 rounded-xl border border-border-light shadow-sm mb-5">
-        <h3 className="flex items-center gap-2 font-bold text-ink mb-2">
+      <div className="bg-white p-8 rounded-2xl border border-border-light shadow-sm mb-10">
+        <h3 className="flex items-center gap-2 font-bold text-ink mb-4">
           <svg viewBox="0 0 24 24" className="w-5 h-5 fill-[#FF0000]">
             <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
           </svg>
           動画で学ぶ
         </h3>
-        <p className="text-sm text-ink-light mb-3 leading-relaxed">
+        <p className="text-sm text-ink-light mb-5 leading-relaxed">
           はじめてでも安心。動画で{hobby.name}の始め方やコツをチェックしてみましょう。
         </p>
         <a
           href={youtube.search_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-white font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
+          className="inline-flex items-center gap-3 px-6 py-3 rounded-full text-white font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
           style={{ backgroundColor: '#FF0000' }}
         >
           動画を検索
@@ -291,20 +291,20 @@ export default async function HobbyDetail({
       </div>
 
       {/* ④ おすすめグッズ：goods 紹介文 → MultiLinkBox の順 */}
-      <div className="mb-6">
-        <h3 className="flex items-center gap-2 font-bold text-ink mb-3">
+      <div className="mb-16">
+        <h3 className="flex items-center gap-2 font-bold text-ink mb-6">
           <ShoppingBag className="w-5 h-5 text-accent" />
           おすすめグッズ
         </h3>
 
         {/* ④ goods 紹介文を先に表示 */}
-        <div className="text-sm text-ink-light leading-relaxed bg-white/50 p-3 rounded-xl border border-dashed border-border-light mb-4">
+        <div className="text-sm text-ink-light leading-relaxed bg-white/50 p-6 rounded-2xl border border-dashed border-border-light mb-8">
           {formatParagraphsDark(hobby.goods)}
         </div>
 
         {/* 購入ボタン一覧：もしもHTMLがあれば優先、なければ自前ボタン */}
         {hobby.recommend_items && hobby.recommend_items.length > 0 && (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {hobby.recommend_items.map((item: any, i: number) => (
               item.msmaflink_html
                 ? <MossimoLinkBox key={i} html={item.msmaflink_html} asin={item.asin} />
@@ -321,9 +321,9 @@ export default async function HobbyDetail({
       </div>
 
       {/* AIパートナーセクション */}
-      <div className="p-4 bg-ink text-cream rounded-2xl relative overflow-hidden shadow-xl">
+      <div className="p-8 bg-ink text-cream rounded-3xl relative overflow-hidden shadow-2xl">
         <Sparkles className="absolute top-4 right-4 w-12 h-12 text-accent/20" />
-        <h4 className="font-bold mb-2 flex items-center gap-2">
+        <h4 className="font-bold mb-3 flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-accent" />
           AIパートナーからのひとこと
         </h4>
@@ -333,10 +333,10 @@ export default async function HobbyDetail({
       </div>
 
       {/* 記録ボタン */}
-      <div className="mt-6 flex justify-center pb-4">
+      <div className="mt-12 flex justify-center pb-8">
         <Link
           href={`/records/new?hobbyId=${hobby.id}`}
-          className="flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-full font-bold shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300 transform"
+          className="flex items-center gap-3 px-8 py-4 bg-accent text-white rounded-full font-bold shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300 transform"
         >
           <PenLine className="w-6 h-6" />
           この趣味を記録する
